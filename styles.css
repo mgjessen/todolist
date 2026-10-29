@@ -6,6 +6,7 @@
   --text: #1d1d1f;
   --muted: rgba(60, 60, 67, 0.62);
   --border: rgba(0, 0, 0, 0.1);
+  --frame: #8e8e93;
   --accent: #007aff;
   --accent-hover: #0066d6;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
@@ -21,6 +22,7 @@
     --text: #f5f5f7;
     --muted: rgba(235, 235, 245, 0.6);
     --border: rgba(255, 255, 255, 0.12);
+    --frame: #98989d;
     --accent: #0a84ff;
     --accent-hover: #409cff;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
@@ -240,8 +242,8 @@ h1 {
 }
 
 .todo-add .todo-row {
-  width: fit-content;
-  max-width: min(100%, 28rem);
+  width: 100%;
+  padding-right: calc(0.45rem + 1.5rem + 0.45rem + 1.5rem);
 }
 
 .todo-check,
@@ -288,8 +290,9 @@ h1 {
   flex: 1 1 auto;
   min-width: 0;
   margin: 0;
-  padding: 0;
-  border: 0;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--frame);
+  border-radius: 8px;
   background: transparent;
   color: inherit;
   font: inherit;
@@ -297,6 +300,7 @@ h1 {
   text-align: left;
   cursor: text;
   overflow-wrap: anywhere;
+  min-height: 2.25rem;
 }
 
 .todo-item.is-done .todo-text {
@@ -310,30 +314,24 @@ h1 {
   flex: 1 1 auto;
   min-width: 0;
   margin: 0;
-  padding: 0;
-  border: 0;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--frame);
+  border-radius: 8px;
   outline: none;
   background: transparent;
   color: inherit;
   font: inherit;
   line-height: 1.47;
+  min-height: 2.25rem;
 }
 
 .todo-edit-input {
-  flex: 1 1 auto;
-  min-width: 0;
   color: var(--accent);
 }
 
-.todo-add-input {
-  width: 0;
-  flex: 0 0 auto;
-  opacity: 0;
-}
-
-.todo-add:focus-within .todo-add-input {
-  width: min(22rem, calc(100vw - 5rem));
-  opacity: 1;
+.todo-edit-input:focus,
+.todo-add-input:focus {
+  border-color: color-mix(in srgb, var(--frame) 70%, var(--text));
 }
 
 .todo-plus {
