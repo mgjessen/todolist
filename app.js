@@ -104,7 +104,10 @@ function renderItems(items) {
     remove.title = "Delete";
     remove.addEventListener("click", () => deleteItem(item.id));
 
-    row.append(check, text, grip, remove);
+    const controls = document.createElement("div");
+    controls.className = "todo-controls";
+    controls.append(grip, remove);
+    row.append(check, text, controls);
     rowItem.append(row);
     todoList.append(rowItem);
 
@@ -546,4 +549,13 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+function alignRowControls() {
+  const width = clearButton.getBoundingClientRect().width;
+  if (width > 0) {
+    document.documentElement.style.setProperty("--clear-width", `${width}px`);
+  }
+}
+
+alignRowControls();
+window.addEventListener("resize", alignRowControls);
 renderItems(withIds(loadItems()));
