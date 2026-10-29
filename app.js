@@ -102,7 +102,7 @@ function renderItems(items) {
     remove.title = "Delete";
     remove.addEventListener("click", () => deleteItem(item.id));
 
-    row.append(check, text, grip, remove);
+    row.append(check, grip, remove, text);
     rowItem.append(row);
     todoList.append(rowItem);
 
