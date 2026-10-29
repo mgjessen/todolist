@@ -6,7 +6,7 @@
   --text: #1d1d1f;
   --muted: rgba(60, 60, 67, 0.62);
   --border: rgba(0, 0, 0, 0.1);
-  --frame: #8e8e93;
+  --frame: #e9e9eb;
   --accent: #007aff;
   --accent-hover: #0066d6;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
@@ -22,7 +22,7 @@
     --text: #f5f5f7;
     --muted: rgba(235, 235, 245, 0.6);
     --border: rgba(255, 255, 255, 0.12);
-    --frame: #98989d;
+    --frame: #2e2e30;
     --accent: #0a84ff;
     --accent-hover: #409cff;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
@@ -435,7 +435,7 @@ h1 {
   position: relative;
   z-index: 1;
   border-radius: 8px;
-  background: var(--fill);
+  background: var(--frame);
 }
 
 .todo-item.is-dragging .todo-text {
