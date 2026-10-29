@@ -342,7 +342,12 @@ function confirmClearList() {
     return;
   }
   hideClearWarning();
-  replaceList([], "List cleared.");
+  saveItems([]);
+  editingId = null;
+  renderItems([]);
+  window.clearTimeout(saveStatusTimer);
+  saveStatus.hidden = true;
+  saveStatus.textContent = "";
 }
 
 function beginEdit(id) {
