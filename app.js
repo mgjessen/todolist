@@ -499,7 +499,9 @@ function sortItems(compare) {
 }
 
 function sortAlphabetically() {
-  sortItems((a, b) => a.text.localeCompare(b.text, undefined, { sensitivity: "base" }));
+  sortItems((a, b) =>
+    a.text.localeCompare(b.text, undefined, { numeric: true, sensitivity: "base" })
+  );
 }
 
 function sortByTime() {
