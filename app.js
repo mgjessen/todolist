@@ -242,6 +242,12 @@ function showSaveStatus(message) {
   }, 5000);
 }
 
+function hideSaveStatus() {
+  window.clearTimeout(saveStatusTimer);
+  saveStatus.hidden = true;
+  saveStatus.textContent = "";
+}
+
 function downloadTextFile(filename, text) {
   const blob = new Blob([text.endsWith("\n") ? text : `${text}\n`], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -268,16 +274,15 @@ function exportList() {
     return;
   }
 
-  const filename = exportFilename(new Date());
-  downloadTextFile(filename, itemsToText(items));
-  showSaveStatus(`Downloaded ${filename}. Check Downloads if it doesn't open.`);
+  downloadTextFile(exportFilename(new Date()), itemsToText(items));
+  hideSaveStatus();
 }
 
-function replaceList(items, message) {
+function replaceList(items) {
   saveItems(items);
   editingId = null;
   renderItems(items);
-  showSaveStatus(message);
+  hideSaveStatus();
 }
 
 function applyImportedList(text) {
@@ -289,8 +294,7 @@ function applyImportedList(text) {
   if (loadItems().length > 0 && !window.confirm("Replace the current list with this file?")) {
     return;
   }
-  const label = imported.length === 1 ? "item" : "items";
-  replaceList(imported, `Imported ${imported.length} ${label}.`);
+  replaceList(imported);
 }
 
 function importListFile(file) {
@@ -345,9 +349,7 @@ function confirmClearList() {
   saveItems([]);
   editingId = null;
   renderItems([]);
-  window.clearTimeout(saveStatusTimer);
-  saveStatus.hidden = true;
-  saveStatus.textContent = "";
+  hideSaveStatus();
 }
 
 function beginEdit(id) {
