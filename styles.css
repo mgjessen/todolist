@@ -134,6 +134,8 @@ h1 {
 .log-scroll {
   flex: 1 1 auto;
   min-height: 0;
+  margin-right: -11px;
+  padding-right: 16px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
