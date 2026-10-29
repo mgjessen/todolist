@@ -165,8 +165,7 @@ function createAddRow(draft) {
   input.id = "add-input";
   input.type = "text";
   input.className = "todo-add-input";
-  input.placeholder = "Add an item…";
-  input.setAttribute("aria-label", "Add an item");
+  input.setAttribute("aria-label", "New item");
   input.autocomplete = "off";
   input.value = draft;
   input.addEventListener("keydown", (event) => {

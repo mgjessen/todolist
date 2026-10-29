@@ -240,7 +240,8 @@ h1 {
 }
 
 .todo-add .todo-row {
-  width: min(100%, 28rem);
+  width: fit-content;
+  max-width: min(100%, 28rem);
 }
 
 .todo-check,
@@ -326,8 +327,15 @@ h1 {
   color: var(--accent);
 }
 
-.todo-add-input::placeholder {
-  color: var(--muted);
+.todo-add-input {
+  width: 0;
+  flex: 0 0 auto;
+  opacity: 0;
+}
+
+.todo-add:focus-within .todo-add-input {
+  width: min(22rem, calc(100vw - 5rem));
+  opacity: 1;
 }
 
 .todo-plus {
