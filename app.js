@@ -3,6 +3,8 @@ const STORAGE_KEY = "todolist-items";
 const exportButton = document.getElementById("export-button");
 const importButton = document.getElementById("import-button");
 const importInput = document.getElementById("import-input");
+const sortTimeButton = document.getElementById("sort-time");
+const sortAlphaButton = document.getElementById("sort-alpha");
 const clearButton = document.getElementById("clear-button");
 const clearWarning = document.getElementById("clear-warning");
 const clearCancel = document.getElementById("clear-cancel");
@@ -481,6 +483,24 @@ function autoScroll(clientY) {
   }
 }
 
+function sortItems(compare) {
+  if (editingId) {
+    commitEdit();
+  }
+  const items = withIds(loadItems());
+  items.sort(compare);
+  saveItems(items);
+  renderItems(items);
+}
+
+function sortAlphabetically() {
+  sortItems((a, b) => a.text.localeCompare(b.text, undefined, { sensitivity: "base" }));
+}
+
+function sortByTime() {
+  sortItems((a, b) => String(a.createdAt || "").localeCompare(String(b.createdAt || "")));
+}
+
 function persistOrderFromDom() {
   const order = [...todoList.querySelectorAll(".todo-item[data-id]")].map((el) => el.dataset.id);
   const items = withIds(loadItems());
@@ -503,6 +523,8 @@ importInput.addEventListener("change", () => {
     importListFile(file);
   }
 });
+sortTimeButton.addEventListener("click", sortByTime);
+sortAlphaButton.addEventListener("click", sortAlphabetically);
 clearButton.addEventListener("click", showClearWarning);
 clearCancel.addEventListener("click", hideClearWarning);
 clearConfirm.addEventListener("click", confirmClearList);

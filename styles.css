@@ -154,10 +154,16 @@ h1 {
   gap: 0.75rem;
 }
 
-.log-actions-start {
+.log-actions-start,
+.log-actions-end {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
+}
+
+.log-actions-end {
+  flex: none;
+  justify-content: flex-end;
 }
 
 .clear-warning[hidden] {
