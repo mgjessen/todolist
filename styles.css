@@ -234,7 +234,7 @@ h1 {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
   min-height: 1.85rem;
 }
@@ -285,7 +285,7 @@ h1 {
 }
 
 .todo-text {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -320,10 +320,8 @@ h1 {
 }
 
 .todo-edit-input {
-  flex: 0 1 auto;
-  field-sizing: content;
-  min-width: 4rem;
-  max-width: calc(100vw - 8rem);
+  flex: 1 1 auto;
+  min-width: 0;
   color: var(--accent);
 }
 
