@@ -1,9 +1,5 @@
 const STORAGE_KEY = "todolist-items";
 
-const editor = document.getElementById("editor");
-const addButton = document.getElementById("add-button");
-const cancelButton = document.getElementById("cancel-button");
-const editStatus = document.getElementById("edit-status");
 const exportButton = document.getElementById("export-button");
 const importButton = document.getElementById("import-button");
 const importInput = document.getElementById("import-input");
@@ -13,7 +9,6 @@ const clearCancel = document.getElementById("clear-cancel");
 const clearConfirm = document.getElementById("clear-confirm");
 const saveStatus = document.getElementById("save-status");
 const todoList = document.getElementById("todo-list");
-const emptyState = document.getElementById("empty-state");
 
 let editingId = null;
 
@@ -56,12 +51,20 @@ function pad(value) {
   return String(value).padStart(2, "0");
 }
 
+function fieldText(value) {
+  return String(value || "").replace(/\u00a0/g, " ").trim();
+}
+
 function renderItems(items) {
+  const draft = document.getElementById("add-input")?.value || "";
+  const addFocused = document.activeElement?.id === "add-input";
+  const editDraft = document.querySelector(".todo-edit-input")?.value;
   todoList.replaceChildren();
 
   for (const item of items) {
     const rowItem = document.createElement("li");
     rowItem.className = "todo-item";
+    rowItem.dataset.id = item.id;
     if (item.done) {
       rowItem.classList.add("is-done");
     }
@@ -85,19 +88,100 @@ function renderItems(items) {
     text.textContent = item.text;
     text.addEventListener("click", () => beginEdit(item.id));
 
+    const grip = document.createElement("button");
+    grip.type = "button";
+    grip.className = "todo-grip";
+    grip.setAttribute("aria-label", `Drag to reorder ${item.text}`);
+    grip.title = "Drag to reorder";
+    bindDrag(grip, rowItem);
+
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "todo-delete";
-    remove.textContent = "Delete";
     remove.setAttribute("aria-label", `Delete ${item.text}`);
+    remove.title = "Delete";
     remove.addEventListener("click", () => deleteItem(item.id));
 
-    row.append(check, text, remove);
+    row.append(check, text, grip, remove);
     rowItem.append(row);
     todoList.append(rowItem);
+
+    if (item.id === editingId) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "todo-edit-input";
+      input.value = editDraft != null ? editDraft : item.text;
+      input.setAttribute("aria-label", "Edit item");
+      input.autocomplete = "off";
+      text.replaceWith(input);
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          commitEdit();
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          cancelEdit();
+        }
+      });
+      input.addEventListener("blur", () => {
+        window.setTimeout(() => {
+          if (editingId === item.id && document.activeElement !== input) {
+            commitEdit();
+          }
+        }, 0);
+      });
+    }
   }
 
-  emptyState.hidden = items.length > 0;
+  todoList.append(createAddRow(draft));
+  if (addFocused) {
+    document.getElementById("add-input")?.focus();
+  }
+}
+
+function createAddRow(draft) {
+  const rowItem = document.createElement("li");
+  rowItem.className = "todo-item todo-add";
+
+  const row = document.createElement("div");
+  row.className = "todo-row";
+
+  const plus = document.createElement("button");
+  plus.type = "button";
+  plus.className = "todo-plus";
+  plus.setAttribute("aria-label", "Add an item");
+  plus.title = "Add";
+  plus.addEventListener("click", () => {
+    const input = document.getElementById("add-input");
+    if (fieldText(input?.value)) {
+      addItem();
+      return;
+    }
+    input?.focus();
+  });
+
+  const input = document.createElement("input");
+  input.id = "add-input";
+  input.type = "text";
+  input.className = "todo-add-input";
+  input.placeholder = "Add an item…";
+  input.setAttribute("aria-label", "Add an item");
+  input.autocomplete = "off";
+  input.value = draft;
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addItem();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      input.value = "";
+    }
+  });
+
+  row.append(plus, input);
+  rowItem.append(row);
+  return rowItem;
 }
 
 function itemsToText(items) {
@@ -190,7 +274,7 @@ function exportList() {
 
 function replaceList(items, message) {
   saveItems(items);
-  endEdit();
+  editingId = null;
   renderItems(items);
   showSaveStatus(message);
 }
@@ -215,6 +299,9 @@ function importListFile(file) {
 }
 
 function toggleItem(id) {
+  if (editingId) {
+    commitEdit();
+  }
   const items = withIds(loadItems());
   const item = items.find((entry) => entry.id === id);
   if (!item) {
@@ -226,10 +313,12 @@ function toggleItem(id) {
 }
 
 function deleteItem(id) {
-  const items = withIds(loadItems()).filter((item) => item.id !== id);
   if (editingId === id) {
-    endEdit();
+    editingId = null;
+  } else if (editingId) {
+    commitEdit();
   }
+  const items = withIds(loadItems()).filter((item) => item.id !== id);
   saveItems(items);
   renderItems(items);
 }
@@ -255,71 +344,55 @@ function confirmClearList() {
   replaceList([], "List cleared.");
 }
 
-function setEditing(active) {
-  addButton.textContent = active ? "Update" : "Add";
-  addButton.title = active ? "Update (Enter)" : "Add (Enter)";
-  cancelButton.hidden = !active;
-  editStatus.hidden = !active;
-  editor.setAttribute("aria-label", active ? "Edit item" : "Add an item");
-  editor.placeholder = active ? "Edit item…" : "Add an item…";
-}
-
 function beginEdit(id) {
-  const item = withIds(loadItems()).find((entry) => entry.id === id);
-  if (!item) {
+  if (editingId === id) {
     return;
   }
+  if (editingId) {
+    commitEdit();
+  }
   editingId = id;
-  editor.value = item.text;
-  setEditing(true);
   renderItems(withIds(loadItems()));
-  editor.focus();
-  editor.setSelectionRange(editor.value.length, editor.value.length);
+  const input = todoList.querySelector(".todo-edit-input");
+  if (!input) {
+    return;
+  }
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
 }
 
-function endEdit() {
+function commitEdit() {
+  if (!editingId) {
+    return;
+  }
+  const id = editingId;
+  const input = todoList.querySelector(".todo-edit-input");
+  const text = input ? fieldText(input.value) : "";
   editingId = null;
-  editor.value = "";
-  setEditing(false);
+  const items = withIds(loadItems());
+  const item = items.find((entry) => entry.id === id);
+  if (item && text) {
+    item.text = text;
+    saveItems(items);
+  }
+  renderItems(items);
 }
 
 function cancelEdit() {
-  endEdit();
+  editingId = null;
   renderItems(withIds(loadItems()));
-  editor.focus();
-}
-
-function editorText() {
-  return editor.value.replace(/\u00a0/g, " ").trim();
-}
-
-function updateItem() {
-  const text = editorText();
-  if (!text) {
-    editor.focus();
-    return;
-  }
-
-  const items = withIds(loadItems());
-  const item = items.find((entry) => entry.id === editingId);
-  if (!item) {
-    endEdit();
-    renderItems(items);
-    return;
-  }
-
-  item.text = text;
-  saveItems(items);
-  endEdit();
-  renderItems(items);
-  editor.focus();
+  document.getElementById("add-input")?.focus();
 }
 
 function addItem() {
-  const text = editorText();
+  const input = document.getElementById("add-input");
+  const text = fieldText(input?.value);
   if (!text) {
-    editor.focus();
+    input?.focus();
     return;
+  }
+  if (editingId) {
+    commitEdit();
   }
 
   const items = withIds(loadItems());
@@ -330,21 +403,98 @@ function addItem() {
     createdAt: new Date().toISOString(),
   });
   saveItems(items);
-  endEdit();
   renderItems(items);
-  editor.focus();
+  const addInput = document.getElementById("add-input");
+  if (addInput) {
+    addInput.value = "";
+    addInput.focus();
+  }
 }
 
-function submitItem() {
-  if (editingId) {
-    updateItem();
+function bindDrag(grip, rowItem) {
+  grip.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) {
+      return;
+    }
+    event.preventDefault();
+    grip.setPointerCapture(event.pointerId);
+    rowItem.classList.add("is-dragging");
+  });
+
+  grip.addEventListener("pointermove", (event) => {
+    if (!rowItem.classList.contains("is-dragging")) {
+      return;
+    }
+    reorderFromPointer(rowItem, event.clientY);
+    autoScroll(event.clientY);
+  });
+
+  const finish = () => {
+    if (!rowItem.classList.contains("is-dragging")) {
+      return;
+    }
+    rowItem.classList.remove("is-dragging");
+    persistOrderFromDom();
+  };
+
+  grip.addEventListener("pointerup", finish);
+  grip.addEventListener("pointercancel", finish);
+}
+
+function reorderFromPointer(dragEl, clientY) {
+  const rows = [...todoList.querySelectorAll(".todo-item[data-id]")];
+  let target = null;
+  for (const el of rows) {
+    if (el === dragEl) {
+      continue;
+    }
+    const rect = el.getBoundingClientRect();
+    const mid = rect.top + rect.height / 2;
+    if (clientY < mid) {
+      target = el;
+      break;
+    }
+  }
+
+  const addRow = todoList.querySelector(".todo-add");
+  if (target) {
+    if (dragEl.nextElementSibling !== target) {
+      todoList.insertBefore(dragEl, target);
+    }
     return;
   }
-  addItem();
+  if (addRow && dragEl.nextElementSibling !== addRow) {
+    todoList.insertBefore(dragEl, addRow);
+  }
 }
 
-addButton.addEventListener("click", submitItem);
-cancelButton.addEventListener("click", cancelEdit);
+function autoScroll(clientY) {
+  const scroller = todoList.closest(".log-scroll");
+  if (!scroller) {
+    return;
+  }
+  const rect = scroller.getBoundingClientRect();
+  const edge = 40;
+  if (clientY < rect.top + edge) {
+    scroller.scrollTop -= 14;
+  } else if (clientY > rect.bottom - edge) {
+    scroller.scrollTop += 14;
+  }
+}
+
+function persistOrderFromDom() {
+  const order = [...todoList.querySelectorAll(".todo-item[data-id]")].map((el) => el.dataset.id);
+  const items = withIds(loadItems());
+  const byId = new Map(items.map((item) => [item.id, item]));
+  const next = order.map((id) => byId.get(id)).filter(Boolean);
+  for (const item of items) {
+    if (!next.includes(item)) {
+      next.push(item);
+    }
+  }
+  saveItems(next);
+}
+
 exportButton.addEventListener("click", exportList);
 importButton.addEventListener("click", () => importInput.click());
 importInput.addEventListener("change", () => {
@@ -358,27 +508,11 @@ clearButton.addEventListener("click", showClearWarning);
 clearCancel.addEventListener("click", hideClearWarning);
 clearConfirm.addEventListener("click", confirmClearList);
 
-editor.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    submitItem();
-  }
-});
-
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
-    event.preventDefault();
-    submitItem();
-  }
   if (event.key === "Escape" && !clearWarning.hidden) {
     event.preventDefault();
     hideClearWarning();
-    editor.focus();
-    return;
-  }
-  if (event.key === "Escape" && editingId) {
-    event.preventDefault();
-    cancelEdit();
+    document.getElementById("add-input")?.focus();
   }
 });
 

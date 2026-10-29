@@ -24,7 +24,7 @@
         document.head.appendChild(theme);
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=1" />
+    <link rel="stylesheet" href="styles.css?v=3" />
   </head>
   <body>
     <main class="app">
@@ -35,25 +35,6 @@
           <span class="mark">GEESE</span>
         </div>
       </header>
-
-      <section class="composer" aria-label="Add an item">
-        <input
-          id="editor"
-          class="editor"
-          type="text"
-          autocomplete="off"
-          aria-label="Add an item"
-          placeholder="Add an item…"
-        />
-
-        <div class="composer-actions">
-          <p id="edit-status" class="edit-status" hidden>Editing item</p>
-          <div class="action-buttons">
-            <button type="button" id="cancel-button" class="cancel-button" hidden>Cancel</button>
-            <button type="button" id="add-button" class="log-button" title="Add (Enter)">Add</button>
-          </div>
-        </div>
-      </section>
 
       <section class="log" aria-label="To do list">
         <div class="log-header">
@@ -78,11 +59,10 @@
         <p id="save-status" class="save-status" hidden></p>
         <div class="log-scroll">
           <ul id="todo-list" class="todo-list"></ul>
-          <p id="empty-state" class="empty-state">No items yet.</p>
         </div>
       </section>
     </main>
 
-    <script src="app.js?v=1"></script>
+    <script src="app.js?v=2"></script>
   </body>
 </html>
