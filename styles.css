@@ -296,7 +296,7 @@ h1 {
   flex: 1 1 auto;
   min-width: 0;
   margin: 0;
-  padding: 0.35rem 0.65rem;
+  padding: 0.15rem 0.28rem;
   border: 1px solid var(--frame);
   border-radius: 8px;
   background: transparent;
@@ -306,7 +306,7 @@ h1 {
   text-align: left;
   cursor: text;
   overflow-wrap: anywhere;
-  min-height: 2.25rem;
+  min-height: 1.8rem;
 }
 
 .todo-item.is-done .todo-text {
@@ -320,7 +320,7 @@ h1 {
   flex: 1 1 auto;
   min-width: 0;
   margin: 0;
-  padding: 0.35rem 0.65rem;
+  padding: 0.15rem 0.28rem;
   border: 1px solid var(--frame);
   border-radius: 8px;
   outline: none;
@@ -328,7 +328,7 @@ h1 {
   color: inherit;
   font: inherit;
   line-height: 1.47;
-  min-height: 2.25rem;
+  min-height: 1.8rem;
 }
 
 .todo-edit-input {
