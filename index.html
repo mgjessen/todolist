@@ -24,7 +24,7 @@
         document.head.appendChild(theme);
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=9" />
+    <link rel="stylesheet" href="styles.css?v=10" />
   </head>
   <body>
     <main class="app">
@@ -39,17 +39,19 @@
       <section class="log" aria-label="To do list">
         <div class="log-header">
           <div class="log-actions">
-            <div class="log-actions-start">
-              <button type="button" id="import-button" class="save-button">Import</button>
-              <button type="button" id="export-button" class="save-button" title="Download the list">
-                Export
-              </button>
+            <div class="log-actions-main">
+              <div class="log-actions-start">
+                <button type="button" id="import-button" class="save-button">Import</button>
+                <button type="button" id="export-button" class="save-button" title="Download the list">
+                  Export
+                </button>
+              </div>
+              <div class="log-actions-sort">
+                <button type="button" id="sort-alpha" class="save-button">A-Z</button>
+                <button type="button" id="sort-time" class="save-button">Chrono</button>
+              </div>
             </div>
-            <div class="log-actions-end">
-              <button type="button" id="sort-alpha" class="save-button">A-Z</button>
-              <button type="button" id="sort-time" class="save-button">Chrono</button>
-              <button type="button" id="clear-button" class="save-button clear-button">Clear</button>
-            </div>
+            <button type="button" id="clear-button" class="save-button clear-button">Clear</button>
           </div>
           <input id="import-input" type="file" accept=".txt,text/plain" hidden />
         </div>

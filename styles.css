@@ -150,22 +150,29 @@ h1 {
 
 .log-actions {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  width: 100%;
-  gap: 0.75rem;
-}
-
-.log-actions-start,
-.log-actions-end {
-  display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-end;
+  width: 100%;
   gap: 0.4rem;
 }
 
-.log-actions-end {
+.log-actions-main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: max-content;
+}
+
+.log-actions-start,
+.log-actions-sort {
+  display: flex;
   flex: none;
-  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 0.4rem;
 }
 
 .clear-warning[hidden] {
