@@ -93,8 +93,7 @@ function renderItems(items) {
     const grip = document.createElement("button");
     grip.type = "button";
     grip.className = "todo-grip";
-    grip.setAttribute("aria-label", `Drag to reorder ${item.text}`);
-    grip.title = "Drag to reorder";
+    grip.setAttribute("aria-label", `Reorder ${item.text}`);
     bindDrag(grip, rowItem);
 
     const remove = document.createElement("button");
