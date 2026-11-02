@@ -24,7 +24,7 @@
         document.head.appendChild(theme);
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=16" />
+    <link rel="stylesheet" href="styles.css?v=17" />
   </head>
   <body>
     <main class="app">
@@ -47,8 +47,10 @@
                 </button>
               </div>
               <div class="log-actions-sort">
-                <button type="button" id="done-place" class="save-button" aria-pressed="false">✔️ bottom</button>
-                <button type="button" id="sort-mode" class="save-button">◯ a-z</button>
+                <button type="button" id="done-place" class="save-button mode-button" aria-pressed="true">✔️ in place</button>
+                <button type="button" id="done-bottom" class="save-button mode-button" aria-pressed="false">✔️ bottom</button>
+                <button type="button" id="sort-manual" class="save-button mode-button" aria-pressed="true">◯ sorted</button>
+                <button type="button" id="sort-alpha" class="save-button mode-button" aria-pressed="false">◯ a-z</button>
               </div>
             </div>
           </div>
@@ -68,6 +70,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=17"></script>
+    <script src="app.js?v=18"></script>
   </body>
 </html>

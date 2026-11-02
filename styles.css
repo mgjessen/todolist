@@ -124,6 +124,12 @@ h1 {
   background: color-mix(in srgb, var(--fill) 70%, var(--text));
 }
 
+.mode-button[aria-pressed="true"],
+.mode-button[aria-pressed="true"]:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
 .log {
   display: flex;
   flex: 1 1 auto;

@@ -5,7 +5,9 @@ const exportButton = document.getElementById("export-button");
 const importButton = document.getElementById("import-button");
 const importInput = document.getElementById("import-input");
 const donePlaceButton = document.getElementById("done-place");
-const sortModeButton = document.getElementById("sort-mode");
+const doneBottomButton = document.getElementById("done-bottom");
+const sortManualButton = document.getElementById("sort-manual");
+const sortAlphaButton = document.getElementById("sort-alpha");
 const clearButton = document.createElement("button");
 clearButton.type = "button";
 clearButton.id = "clear-button";
@@ -582,27 +584,39 @@ function compareAlpha(a, b) {
   return a.text.localeCompare(b.text, undefined, { numeric: true, sensitivity: "base" });
 }
 
+function setPressed(button, pressed) {
+  button.setAttribute("aria-pressed", pressed ? "true" : "false");
+}
+
 function updateSortButton() {
-  sortModeButton.textContent = listSort === "alpha" ? "◯ sorted" : "◯ a-z";
+  const alpha = listSort === "alpha";
+  setPressed(sortAlphaButton, alpha);
+  setPressed(sortManualButton, !alpha);
 }
 
 function updateDoneButton() {
-  donePlaceButton.textContent = doneAtBottom ? "✔️ in place" : "✔️ bottom";
-  donePlaceButton.setAttribute("aria-pressed", doneAtBottom ? "true" : "false");
+  setPressed(doneBottomButton, doneAtBottom);
+  setPressed(donePlaceButton, !doneAtBottom);
 }
 
-function toggleDonePlacement() {
-  doneAtBottom = !doneAtBottom;
+function setDonePlacement(atBottom) {
+  if (doneAtBottom === atBottom) {
+    return;
+  }
+  doneAtBottom = atBottom;
   localStorage.setItem(DONE_BOTTOM_KEY, doneAtBottom ? "1" : "0");
   updateDoneButton();
   showItems(withIds(loadItems()));
 }
 
-function applySort() {
+function setSortMode(mode) {
+  if (listSort === mode) {
+    return;
+  }
   if (editingId) {
     commitEdit();
   }
-  listSort = listSort === "alpha" ? "manual" : "alpha";
+  listSort = mode;
   showItems(withIds(loadItems()));
 }
 
@@ -615,8 +629,10 @@ importInput.addEventListener("change", () => {
     importListFile(file);
   }
 });
-donePlaceButton.addEventListener("click", toggleDonePlacement);
-sortModeButton.addEventListener("click", applySort);
+donePlaceButton.addEventListener("click", () => setDonePlacement(false));
+doneBottomButton.addEventListener("click", () => setDonePlacement(true));
+sortManualButton.addEventListener("click", () => setSortMode("manual"));
+sortAlphaButton.addEventListener("click", () => setSortMode("alpha"));
 clearButton.addEventListener("click", showClearWarning);
 clearCancel.addEventListener("click", hideClearWarning);
 clearConfirm.addEventListener("click", confirmClearList);
