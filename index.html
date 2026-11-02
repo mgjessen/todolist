@@ -24,7 +24,7 @@
         document.head.appendChild(theme);
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=25" />
+    <link rel="stylesheet" href="styles.css?v=26" />
   </head>
   <body>
     <main class="app">
@@ -39,12 +39,30 @@
       <section class="log" aria-label="To do list">
         <div class="log-header">
           <div class="log-toolbar">
-            <button type="button" id="import-button" class="save-button" title="Import">Imp.</button>
-            <button type="button" id="export-button" class="save-button" title="Export">Exp.</button>
-            <button type="button" id="done-place" class="save-button mode-button" aria-pressed="true" title="Sorted"><span class="mode-check" aria-hidden="true"></span>Sort.</button>
-            <button type="button" id="done-bottom" class="save-button mode-button" aria-pressed="false" title="Bottom"><span class="mode-check" aria-hidden="true"></span>Bot.</button>
-            <button type="button" id="sort-alpha" class="save-button mode-button" aria-pressed="false" title="A-Z"><span class="mode-check mode-ring" aria-hidden="true"></span>A-Z</button>
-            <button type="button" id="sort-manual" class="save-button mode-button" aria-pressed="true" title="Sorted"><span class="mode-check mode-ring" aria-hidden="true"></span>Sort.</button>
+            <button type="button" id="import-button" class="save-button icon-button" title="Import" aria-label="Import">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+              </svg>
+            </button>
+            <button type="button" id="export-button" class="save-button icon-button" title="Export" aria-label="Export">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                <polyline points="17 21 17 13 7 13 7 21" />
+                <polyline points="7 3 7 8 15 8" />
+              </svg>
+            </button>
+            <div class="mode-split">
+              <span class="mode-check" aria-hidden="true"></span>
+              <button type="button" id="done-place" class="mode-word" aria-pressed="true" title="Sorted">Sorted</button>
+              <span class="mode-slash" aria-hidden="true">/</span>
+              <button type="button" id="done-bottom" class="mode-word" aria-pressed="false" title="Bottom">Bottom</button>
+            </div>
+            <div class="mode-split">
+              <span class="mode-check mode-ring" aria-hidden="true"></span>
+              <button type="button" id="sort-alpha" class="mode-word" aria-pressed="false" title="A-Z">A-Z</button>
+              <span class="mode-slash" aria-hidden="true">/</span>
+              <button type="button" id="sort-manual" class="mode-word" aria-pressed="true" title="Sorted">Sorted</button>
+            </div>
           </div>
           <input id="import-input" type="file" accept=".txt,text/plain" hidden />
         </div>
@@ -62,6 +80,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=21"></script>
+    <script src="app.js?v=22"></script>
   </body>
 </html>

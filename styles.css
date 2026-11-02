@@ -124,26 +124,60 @@ h1 {
   background: color-mix(in srgb, var(--fill) 70%, var(--text));
 }
 
-.mode-button[aria-pressed="true"],
-.mode-button[aria-pressed="true"]:hover {
+.log-toolbar .icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 1.7rem;
+  min-height: 1.4rem;
+  padding: 0.12rem;
+}
+
+.icon-button svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mode-split {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.28rem;
+  min-height: 1.4rem;
+  padding: 0.08rem 0.42rem 0.08rem 0.32rem;
+  border-radius: 6px;
   background: var(--fill);
   color: var(--text);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.mode-split:hover {
+  background: color-mix(in srgb, var(--fill) 70%, var(--text));
+}
+
+.mode-word {
+  padding: 0.12rem 0.02rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mode-word[aria-pressed="true"] {
   font-weight: 700;
 }
 
-.mode-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.35rem;
-}
-
-.log-toolbar .save-button {
-  justify-content: flex-start;
-  text-align: left;
-  font-size: 0.75rem;
-  min-height: 1.4rem;
-  padding: 0.12rem 0.4rem;
+.mode-slash {
+  font-weight: 500;
+  opacity: 0.55;
 }
 
 .mode-check {

@@ -652,27 +652,7 @@ function alignRowControls() {
   }
 }
 
-function equalizeTopButtons() {
-  const buttons = [...document.querySelectorAll(".log-toolbar .save-button")];
-  if (buttons.length === 0) {
-    return;
-  }
-  buttons.forEach((button) => {
-    button.style.width = "max-content";
-    button.style.fontWeight = "700";
-  });
-  const widest = Math.ceil(Math.max(...buttons.map((button) => button.getBoundingClientRect().width)));
-  buttons.forEach((button) => {
-    button.style.width = `${widest}px`;
-    button.style.fontWeight = "";
-  });
-}
-
-window.addEventListener("resize", () => {
-  equalizeTopButtons();
-  alignRowControls();
-});
+window.addEventListener("resize", alignRowControls);
 updateDoneButton();
 showItems(withIds(loadItems()));
-equalizeTopButtons();
 alignRowControls();
