@@ -131,6 +131,32 @@ h1 {
   font-weight: 700;
 }
 
+.mode-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.mode-check {
+  display: inline-grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 1.5px solid color-mix(in srgb, var(--text) 55%, transparent);
+  border-radius: 50%;
+  color: var(--text);
+}
+
+.mode-check::after {
+  content: "";
+  width: 0.28rem;
+  height: 0.5rem;
+  margin-top: -0.12rem;
+  border: solid currentColor;
+  border-width: 0 1.75px 1.75px 0;
+  transform: rotate(45deg);
+}
+
 .log {
   display: flex;
   flex: 1 1 auto;
