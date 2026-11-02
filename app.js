@@ -191,7 +191,7 @@ function createAddRow(draft) {
     }
   });
 
-  row.append(plus, input, clearButton);
+  row.append(plus, input);
   rowItem.append(row);
   return rowItem;
 }
@@ -652,6 +652,7 @@ function alignRowControls() {
   }
 }
 
+document.querySelector(".log-footer").append(clearButton);
 window.addEventListener("resize", alignRowControls);
 updateDoneButton();
 showItems(withIds(loadItems()));

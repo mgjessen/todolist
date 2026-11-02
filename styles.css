@@ -164,14 +164,14 @@ h1 {
   gap: 0.4rem;
 }
 
-.log-actions-main {
+.log-footer {
   display: flex;
-  flex: 1 1 auto;
-  flex-wrap: nowrap;
-  align-items: flex-start;
+  flex: none;
+  align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  min-width: max-content;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+  padding: 0 0.15rem;
 }
 
 .log-actions-start,
@@ -265,6 +265,7 @@ h1 {
 
 .todo-add .todo-row {
   width: 100%;
+  padding-right: calc(0.4rem + var(--clear-width, 4.6rem));
 }
 
 .todo-controls {
