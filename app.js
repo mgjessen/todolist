@@ -19,7 +19,7 @@ const todoList = document.getElementById("todo-list");
 
 let editingId = null;
 let doneAtBottom = localStorage.getItem(DONE_BOTTOM_KEY) === "1";
-let listSort = "time";
+let listSort = "manual";
 
 function loadItems() {
   try {
@@ -289,7 +289,8 @@ function exportList() {
 
 function replaceList(items) {
   editingId = null;
-  commitItems(items);
+  listSort = "manual";
+  saveAndShow(items);
   hideSaveStatus();
 }
 
@@ -311,19 +312,22 @@ function importListFile(file) {
   reader.readAsText(file);
 }
 
-function placeDone(items) {
+function visibleItems(items) {
+  const ordered = listSort === "alpha" ? [...items].sort(compareAlpha) : [...items];
   if (!doneAtBottom) {
-    return items;
+    return ordered;
   }
-  return [...items.filter((item) => !item.done), ...items.filter((item) => item.done)];
+  return [...ordered.filter((item) => !item.done), ...ordered.filter((item) => item.done)];
 }
 
-function commitItems(items) {
-  const next = placeDone(items);
-  saveItems(next);
-  renderItems(next);
-  updateSortButton(next);
-  return next;
+function showItems(items) {
+  renderItems(visibleItems(items));
+  updateSortButton();
+}
+
+function saveAndShow(items) {
+  saveItems(items);
+  showItems(items);
 }
 
 function toggleItem(id) {
@@ -336,7 +340,7 @@ function toggleItem(id) {
     return;
   }
   item.done = !item.done;
-  commitItems(items);
+  saveAndShow(items);
 }
 
 function deleteItem(id) {
@@ -346,8 +350,7 @@ function deleteItem(id) {
     commitEdit();
   }
   const items = withIds(loadItems()).filter((item) => item.id !== id);
-  saveItems(items);
-  renderItems(items);
+  saveAndShow(items);
 }
 
 function showClearWarning() {
@@ -368,9 +371,9 @@ function confirmClearList() {
     return;
   }
   hideClearWarning();
-  saveItems([]);
   editingId = null;
-  renderItems([]);
+  listSort = "manual";
+  saveAndShow([]);
   hideSaveStatus();
 }
 
@@ -382,7 +385,7 @@ function beginEdit(id) {
     commitEdit();
   }
   editingId = id;
-  renderItems(withIds(loadItems()));
+  showItems(withIds(loadItems()));
   const input = todoList.querySelector(".todo-edit-input");
   if (!input) {
     return;
@@ -405,12 +408,12 @@ function commitEdit() {
     item.text = text;
     saveItems(items);
   }
-  renderItems(items);
+  showItems(withIds(loadItems()));
 }
 
 function cancelEdit() {
   editingId = null;
-  renderItems(withIds(loadItems()));
+  showItems(withIds(loadItems()));
   document.getElementById("add-input")?.focus();
 }
 
@@ -432,7 +435,7 @@ function addItem() {
     done: false,
     createdAt: new Date().toISOString(),
   });
-  commitItems(items);
+  saveAndShow(items);
   const addInput = document.getElementById("add-input");
   if (addInput) {
     addInput.value = "";
@@ -481,7 +484,7 @@ function bindDrag(grip, rowItem) {
         seen += 1;
         insertAt = seen;
       }
-      newIndex = boundedIndex(startIndex, insertAt);
+      newIndex = boundedIndex(rows.map((el) => el.dataset.id), startIndex, insertAt);
       const shift = newIndex - startIndex;
       rows.forEach((el, index) => {
         if (index === startIndex) {
@@ -514,10 +517,13 @@ function bindDrag(grip, rowItem) {
       if (newIndex === startIndex) {
         return;
       }
-      const items = withIds(loadItems());
-      const [moved] = items.splice(startIndex, 1);
-      items.splice(newIndex, 0, moved);
-      commitItems(items);
+      const home = withIds(loadItems());
+      const byId = new Map(home.map((item) => [item.id, item]));
+      const visible = rows.map((el) => byId.get(el.dataset.id)).filter(Boolean);
+      const [moved] = visible.splice(startIndex, 1);
+      visible.splice(newIndex, 0, moved);
+      listSort = "manual";
+      saveAndShow(mergeDraggedOrder(home, visible));
     };
 
     grip.addEventListener("pointermove", move);
@@ -526,16 +532,36 @@ function bindDrag(grip, rowItem) {
   });
 }
 
-function boundedIndex(from, to) {
-  const items = withIds(loadItems());
+function boundedIndex(ids, from, to) {
+  const byId = new Map(withIds(loadItems()).map((item) => [item.id, item]));
+  const visible = ids.map((id) => byId.get(id)).filter(Boolean);
   let next = to;
-  if (doneAtBottom) {
-    const firstDone = items.findIndex((item) => item.done);
+  if (doneAtBottom && visible[from]) {
+    const firstDone = visible.findIndex((item) => item.done);
     if (firstDone !== -1) {
-      next = items[from].done ? Math.max(firstDone, to) : Math.min(Math.max(firstDone - 1, 0), to);
+      next = visible[from].done ? Math.max(firstDone, to) : Math.min(Math.max(firstDone - 1, 0), to);
     }
   }
-  return Math.max(0, Math.min(items.length - 1, next));
+  return Math.max(0, Math.min(Math.max(visible.length - 1, 0), next));
+}
+
+function mergeDraggedOrder(home, visible) {
+  if (!doneAtBottom) {
+    return visible;
+  }
+  const open = visible.filter((item) => !item.done);
+  const done = visible.filter((item) => item.done);
+  const next = home.slice();
+  const openSlots = [];
+  const doneSlots = [];
+  next.forEach((item, index) => (item.done ? doneSlots : openSlots).push(index));
+  open.forEach((item, index) => {
+    next[openSlots[index]] = item;
+  });
+  done.forEach((item, index) => {
+    next[doneSlots[index]] = item;
+  });
+  return next;
 }
 
 function autoScroll(clientY) {
@@ -556,41 +582,8 @@ function compareAlpha(a, b) {
   return a.text.localeCompare(b.text, undefined, { numeric: true, sensitivity: "base" });
 }
 
-function compareTime(a, b) {
-  return String(a.createdAt || "").localeCompare(String(b.createdAt || ""));
-}
-
-function arranged(items, mode) {
-  const sorted = [...items].sort(mode === "alpha" ? compareAlpha : compareTime);
-  return placeDone(sorted);
-}
-
-function sameOrder(left, right) {
-  return left.length === right.length && left.every((item, index) => item.id === right[index].id);
-}
-
-function noteOrder(items) {
-  const time = sameOrder(items, arranged(items, "time"));
-  const alpha = sameOrder(items, arranged(items, "alpha"));
-  if (listSort === "alpha" && alpha) {
-    return;
-  }
-  if (listSort === "time" && time) {
-    return;
-  }
-  if (time && !alpha) {
-    listSort = "time";
-  } else if (alpha && !time) {
-    listSort = "alpha";
-  } else if (!time && !alpha) {
-    listSort = "manual";
-  }
-}
-
-function updateSortButton(items) {
-  const current = items || withIds(loadItems());
-  noteOrder(current);
-  sortModeButton.textContent = listSort === "alpha" ? "Chrono" : "A-Z";
+function updateSortButton() {
+  sortModeButton.textContent = listSort === "alpha" ? "Sorted" : "A-Z";
 }
 
 function updateDoneButton() {
@@ -602,16 +595,15 @@ function toggleDonePlacement() {
   doneAtBottom = !doneAtBottom;
   localStorage.setItem(DONE_BOTTOM_KEY, doneAtBottom ? "1" : "0");
   updateDoneButton();
-  commitItems(withIds(loadItems()));
+  showItems(withIds(loadItems()));
 }
 
 function applySort() {
   if (editingId) {
     commitEdit();
   }
-  const mode = sortModeButton.textContent === "Chrono" ? "time" : "alpha";
-  listSort = mode;
-  commitItems(arranged(withIds(loadItems()), mode));
+  listSort = sortModeButton.textContent === "Sorted" ? "manual" : "alpha";
+  showItems(withIds(loadItems()));
 }
 
 exportButton.addEventListener("click", exportList);
@@ -646,10 +638,5 @@ function alignRowControls() {
 
 window.addEventListener("resize", alignRowControls);
 updateDoneButton();
-const initialItems = placeDone(withIds(loadItems()));
-if (doneAtBottom) {
-  saveItems(initialItems);
-}
-renderItems(initialItems);
+showItems(withIds(loadItems()));
 alignRowControls();
-updateSortButton(initialItems);
