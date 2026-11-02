@@ -222,6 +222,38 @@ h1 {
   margin-left: auto;
 }
 
+.log-toolbar.is-stacked {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.log-toolbar.is-stacked #import-button {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.log-toolbar.is-stacked #export-button {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.log-toolbar.is-stacked #done-toggle,
+.log-toolbar.is-stacked #sort-toggle {
+  margin-left: 0;
+  justify-self: end;
+}
+
+.log-toolbar.is-stacked #done-toggle {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.log-toolbar.is-stacked #sort-toggle {
+  grid-column: 3;
+  grid-row: 2;
+}
+
 .clear-warning[hidden] {
   display: none;
 }

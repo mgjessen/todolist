@@ -646,7 +646,25 @@ function alignRowControls() {
   }
 }
 
-window.addEventListener("resize", alignRowControls);
+function fitToolbar() {
+  const toolbar = document.querySelector(".log-toolbar");
+  if (!toolbar) return;
+  const buttons = [...toolbar.children].filter((element) => element.tagName === "BUTTON");
+  if (buttons.length < 4) return;
+  const gap = parseFloat(getComputedStyle(toolbar).columnGap) || 0;
+  const needed = buttons.reduce((sum, button) => sum + button.offsetWidth, 0) + gap * (buttons.length - 1);
+  const line = document.querySelector(".todo-row");
+  const lineWidth = line ? line.getBoundingClientRect().width : toolbar.clientWidth;
+  const available = Math.min(lineWidth, toolbar.clientWidth);
+  toolbar.classList.toggle("is-stacked", needed > available + 0.5);
+}
+
+window.addEventListener("resize", () => {
+  alignRowControls();
+  fitToolbar();
+});
 updateDoneButton();
 showItems(withIds(loadItems()));
 alignRowControls();
+fitToolbar();
+document.fonts?.ready.then(fitToolbar);
