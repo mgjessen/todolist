@@ -594,7 +594,7 @@ function updateSortButton(items) {
 }
 
 function updateDoneButton() {
-  donePlaceButton.textContent = doneAtBottom ? "In place" : "Bottom";
+  donePlaceButton.textContent = doneAtBottom ? "✔️ in place" : "✔️ bottom";
   donePlaceButton.setAttribute("aria-pressed", doneAtBottom ? "true" : "false");
 }
 
