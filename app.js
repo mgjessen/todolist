@@ -1,10 +1,11 @@
 const STORAGE_KEY = "todolist-items";
+const DONE_BOTTOM_KEY = "todolist-done-bottom";
 
 const exportButton = document.getElementById("export-button");
 const importButton = document.getElementById("import-button");
 const importInput = document.getElementById("import-input");
-const sortTimeButton = document.getElementById("sort-time");
-const sortAlphaButton = document.getElementById("sort-alpha");
+const donePlaceButton = document.getElementById("done-place");
+const sortModeButton = document.getElementById("sort-mode");
 const clearButton = document.getElementById("clear-button");
 const clearWarning = document.getElementById("clear-warning");
 const clearCancel = document.getElementById("clear-cancel");
@@ -13,6 +14,8 @@ const saveStatus = document.getElementById("save-status");
 const todoList = document.getElementById("todo-list");
 
 let editingId = null;
+let doneAtBottom = localStorage.getItem(DONE_BOTTOM_KEY) === "1";
+let listSort = "time";
 
 function loadItems() {
   try {
@@ -281,9 +284,8 @@ function exportList() {
 }
 
 function replaceList(items) {
-  saveItems(items);
   editingId = null;
-  renderItems(items);
+  commitItems(items);
   hideSaveStatus();
 }
 
@@ -305,6 +307,21 @@ function importListFile(file) {
   reader.readAsText(file);
 }
 
+function placeDone(items) {
+  if (!doneAtBottom) {
+    return items;
+  }
+  return [...items.filter((item) => !item.done), ...items.filter((item) => item.done)];
+}
+
+function commitItems(items) {
+  const next = placeDone(items);
+  saveItems(next);
+  renderItems(next);
+  updateSortButton(next);
+  return next;
+}
+
 function toggleItem(id) {
   if (editingId) {
     commitEdit();
@@ -315,8 +332,7 @@ function toggleItem(id) {
     return;
   }
   item.done = !item.done;
-  saveItems(items);
-  renderItems(items);
+  commitItems(items);
 }
 
 function deleteItem(id) {
@@ -412,8 +428,7 @@ function addItem() {
     done: false,
     createdAt: new Date().toISOString(),
   });
-  saveItems(items);
-  renderItems(items);
+  commitItems(items);
   const addInput = document.getElementById("add-input");
   if (addInput) {
     addInput.value = "";
@@ -427,55 +442,96 @@ function bindDrag(grip, rowItem) {
       return;
     }
     event.preventDefault();
-    grip.setPointerCapture(event.pointerId);
+    const pointerId = event.pointerId;
+    grip.setPointerCapture(pointerId);
+
+    const rows = [...todoList.querySelectorAll(".todo-item[data-id]")];
+    const startIndex = rows.indexOf(rowItem);
+    const metrics = rows.map((el) => {
+      const rect = el.getBoundingClientRect();
+      return { el, mid: rect.top + rect.height / 2, height: rect.height };
+    });
+    const startY = event.clientY;
+    const scroller = todoList.closest(".log-scroll");
+    const scrollStart = scroller ? scroller.scrollTop : 0;
     rowItem.classList.add("is-dragging");
+    let newIndex = startIndex;
+
+    const move = (moveEvent) => {
+      if (moveEvent.pointerId !== pointerId) {
+        return;
+      }
+      const scrollDy = (scroller ? scroller.scrollTop : 0) - scrollStart;
+      const pointer = moveEvent.clientY;
+      let insertAt = metrics.length - 1;
+      let seen = 0;
+      for (let index = 0; index < metrics.length; index += 1) {
+        if (index === startIndex) {
+          continue;
+        }
+        const mid = metrics[index].mid - scrollDy;
+        if (pointer < mid) {
+          insertAt = seen;
+          break;
+        }
+        seen += 1;
+        insertAt = seen;
+      }
+      newIndex = boundedIndex(startIndex, insertAt);
+      const shift = newIndex - startIndex;
+      rows.forEach((el, index) => {
+        if (index === startIndex) {
+          el.style.transform = `translateY(${pointer - startY + scrollDy}px)`;
+          return;
+        }
+        let offset = 0;
+        if (shift < 0 && index >= newIndex && index < startIndex) {
+          offset = metrics[startIndex].height;
+        }
+        if (shift > 0 && index > startIndex && index <= newIndex) {
+          offset = -metrics[startIndex].height;
+        }
+        el.style.transform = offset ? `translateY(${offset}px)` : "";
+      });
+      autoScroll(pointer);
+    };
+
+    const finish = (endEvent) => {
+      if (endEvent.pointerId !== pointerId) {
+        return;
+      }
+      grip.removeEventListener("pointermove", move);
+      grip.removeEventListener("pointerup", finish);
+      grip.removeEventListener("pointercancel", finish);
+      rows.forEach((el) => {
+        el.style.transform = "";
+      });
+      rowItem.classList.remove("is-dragging");
+      if (newIndex === startIndex) {
+        return;
+      }
+      const items = withIds(loadItems());
+      const [moved] = items.splice(startIndex, 1);
+      items.splice(newIndex, 0, moved);
+      commitItems(items);
+    };
+
+    grip.addEventListener("pointermove", move);
+    grip.addEventListener("pointerup", finish);
+    grip.addEventListener("pointercancel", finish);
   });
-
-  grip.addEventListener("pointermove", (event) => {
-    if (!rowItem.classList.contains("is-dragging")) {
-      return;
-    }
-    reorderFromPointer(rowItem, event.clientY);
-    autoScroll(event.clientY);
-  });
-
-  const finish = () => {
-    if (!rowItem.classList.contains("is-dragging")) {
-      return;
-    }
-    rowItem.classList.remove("is-dragging");
-    persistOrderFromDom();
-  };
-
-  grip.addEventListener("pointerup", finish);
-  grip.addEventListener("pointercancel", finish);
 }
 
-function reorderFromPointer(dragEl, clientY) {
-  const rows = [...todoList.querySelectorAll(".todo-item[data-id]")];
-  let target = null;
-  for (const el of rows) {
-    if (el === dragEl) {
-      continue;
-    }
-    const rect = el.getBoundingClientRect();
-    const mid = rect.top + rect.height / 2;
-    if (clientY < mid) {
-      target = el;
-      break;
+function boundedIndex(from, to) {
+  const items = withIds(loadItems());
+  let next = to;
+  if (doneAtBottom) {
+    const firstDone = items.findIndex((item) => item.done);
+    if (firstDone !== -1) {
+      next = items[from].done ? Math.max(firstDone, to) : Math.min(Math.max(firstDone - 1, 0), to);
     }
   }
-
-  const addRow = todoList.querySelector(".todo-add");
-  if (target) {
-    if (dragEl.nextElementSibling !== target) {
-      todoList.insertBefore(dragEl, target);
-    }
-    return;
-  }
-  if (addRow && dragEl.nextElementSibling !== addRow) {
-    todoList.insertBefore(dragEl, addRow);
-  }
+  return Math.max(0, Math.min(items.length - 1, next));
 }
 
 function autoScroll(clientY) {
@@ -492,37 +548,66 @@ function autoScroll(clientY) {
   }
 }
 
-function sortItems(compare) {
+function compareAlpha(a, b) {
+  return a.text.localeCompare(b.text, undefined, { numeric: true, sensitivity: "base" });
+}
+
+function compareTime(a, b) {
+  return String(a.createdAt || "").localeCompare(String(b.createdAt || ""));
+}
+
+function arranged(items, mode) {
+  const sorted = [...items].sort(mode === "alpha" ? compareAlpha : compareTime);
+  return placeDone(sorted);
+}
+
+function sameOrder(left, right) {
+  return left.length === right.length && left.every((item, index) => item.id === right[index].id);
+}
+
+function noteOrder(items) {
+  const time = sameOrder(items, arranged(items, "time"));
+  const alpha = sameOrder(items, arranged(items, "alpha"));
+  if (listSort === "alpha" && alpha) {
+    return;
+  }
+  if (listSort === "time" && time) {
+    return;
+  }
+  if (time && !alpha) {
+    listSort = "time";
+  } else if (alpha && !time) {
+    listSort = "alpha";
+  } else if (!time && !alpha) {
+    listSort = "manual";
+  }
+}
+
+function updateSortButton(items) {
+  const current = items || withIds(loadItems());
+  noteOrder(current);
+  sortModeButton.textContent = listSort === "alpha" ? "Chrono" : "A-Z";
+}
+
+function updateDoneButton() {
+  donePlaceButton.textContent = doneAtBottom ? "In place" : "Bottom";
+  donePlaceButton.setAttribute("aria-pressed", doneAtBottom ? "true" : "false");
+}
+
+function toggleDonePlacement() {
+  doneAtBottom = !doneAtBottom;
+  localStorage.setItem(DONE_BOTTOM_KEY, doneAtBottom ? "1" : "0");
+  updateDoneButton();
+  commitItems(withIds(loadItems()));
+}
+
+function applySort() {
   if (editingId) {
     commitEdit();
   }
-  const items = withIds(loadItems());
-  items.sort(compare);
-  saveItems(items);
-  renderItems(items);
-}
-
-function sortAlphabetically() {
-  sortItems((a, b) =>
-    a.text.localeCompare(b.text, undefined, { numeric: true, sensitivity: "base" })
-  );
-}
-
-function sortByTime() {
-  sortItems((a, b) => String(a.createdAt || "").localeCompare(String(b.createdAt || "")));
-}
-
-function persistOrderFromDom() {
-  const order = [...todoList.querySelectorAll(".todo-item[data-id]")].map((el) => el.dataset.id);
-  const items = withIds(loadItems());
-  const byId = new Map(items.map((item) => [item.id, item]));
-  const next = order.map((id) => byId.get(id)).filter(Boolean);
-  for (const item of items) {
-    if (!next.includes(item)) {
-      next.push(item);
-    }
-  }
-  saveItems(next);
+  const mode = sortModeButton.textContent === "Chrono" ? "time" : "alpha";
+  listSort = mode;
+  commitItems(arranged(withIds(loadItems()), mode));
 }
 
 exportButton.addEventListener("click", exportList);
@@ -534,8 +619,8 @@ importInput.addEventListener("change", () => {
     importListFile(file);
   }
 });
-sortTimeButton.addEventListener("click", sortByTime);
-sortAlphaButton.addEventListener("click", sortAlphabetically);
+donePlaceButton.addEventListener("click", toggleDonePlacement);
+sortModeButton.addEventListener("click", applySort);
 clearButton.addEventListener("click", showClearWarning);
 clearCancel.addEventListener("click", hideClearWarning);
 clearConfirm.addEventListener("click", confirmClearList);
@@ -557,4 +642,10 @@ function alignRowControls() {
 
 alignRowControls();
 window.addEventListener("resize", alignRowControls);
-renderItems(withIds(loadItems()));
+updateDoneButton();
+const initialItems = placeDone(withIds(loadItems()));
+if (doneAtBottom) {
+  saveItems(initialItems);
+}
+renderItems(initialItems);
+updateSortButton(initialItems);
