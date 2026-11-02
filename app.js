@@ -6,7 +6,11 @@ const importButton = document.getElementById("import-button");
 const importInput = document.getElementById("import-input");
 const donePlaceButton = document.getElementById("done-place");
 const sortModeButton = document.getElementById("sort-mode");
-const clearButton = document.getElementById("clear-button");
+const clearButton = document.createElement("button");
+clearButton.type = "button";
+clearButton.id = "clear-button";
+clearButton.className = "save-button clear-button";
+clearButton.textContent = "Clear";
 const clearWarning = document.getElementById("clear-warning");
 const clearCancel = document.getElementById("clear-cancel");
 const clearConfirm = document.getElementById("clear-confirm");
@@ -185,7 +189,7 @@ function createAddRow(draft) {
     }
   });
 
-  row.append(plus, input);
+  row.append(plus, input, clearButton);
   rowItem.append(row);
   return rowItem;
 }
@@ -640,7 +644,6 @@ function alignRowControls() {
   }
 }
 
-alignRowControls();
 window.addEventListener("resize", alignRowControls);
 updateDoneButton();
 const initialItems = placeDone(withIds(loadItems()));
@@ -648,4 +651,5 @@ if (doneAtBottom) {
   saveItems(initialItems);
 }
 renderItems(initialItems);
+alignRowControls();
 updateSortButton(initialItems);
