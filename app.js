@@ -471,6 +471,9 @@ function bindDrag(grip, rowItem) {
       const rect = el.getBoundingClientRect();
       return {
         el,
+        left: rect.left,
+        top: rect.top,
+        right: rect.right,
         mid: rect.top + rect.height / 2,
         midX: rect.left + rect.width / 2,
         height: rect.height,
@@ -481,6 +484,7 @@ function bindDrag(grip, rowItem) {
     const scroller = todoList.closest(".log-scroll");
     const scrollStart = scroller ? scroller.scrollTop : 0;
     rowItem.classList.add("is-dragging");
+    if (twoColumn) todoList.classList.add("is-reordering");
     let newIndex = startIndex;
 
     const move = (moveEvent) => {
@@ -491,21 +495,35 @@ function bindDrag(grip, rowItem) {
       const pointer = moveEvent.clientY;
       const pointerX = moveEvent.clientX;
       let insertAt = metrics.length - 1;
-      let seen = 0;
-      for (let index = 0; index < metrics.length; index += 1) {
-        if (index === startIndex) {
-          continue;
+      if (twoColumn) {
+        const left = Math.min(...metrics.map((item) => item.left));
+        const right = Math.max(...metrics.map((item) => item.right));
+        const col = pointerX >= (left + right) / 2 ? 1 : 0;
+        const rowCount = Math.ceil(metrics.length / 2);
+        let row = rowCount - 1;
+        for (let r = 0; r < rowCount; r += 1) {
+          const sample = metrics[Math.min(r * 2, metrics.length - 1)];
+          const next = r + 1 < rowCount ? metrics[Math.min((r + 1) * 2, metrics.length - 1)] : null;
+          const midY = sample.mid - scrollDy;
+          const nextY = next ? next.mid - scrollDy : midY;
+          if (!next || pointer < (midY + nextY) / 2) {
+            row = r;
+            break;
+          }
+          row = r;
         }
-        const mid = metrics[index].mid - scrollDy;
-        const before = twoColumn
-          ? pointer > mid + metrics[index].height / 2 || (Math.abs(pointer - mid) <= metrics[index].height / 2 && pointerX > metrics[index].midX)
-          : pointer >= mid;
-        if (!before) {
+        insertAt = Math.min(row * 2 + col, metrics.length - 1);
+      } else {
+        let seen = 0;
+        for (let index = 0; index < metrics.length; index += 1) {
+          if (index === startIndex) continue;
+          if (pointer < metrics[index].mid - scrollDy) {
+            insertAt = seen;
+            break;
+          }
+          seen += 1;
           insertAt = seen;
-          break;
         }
-        seen += 1;
-        insertAt = seen;
       }
       newIndex = boundedIndex(rows.map((el) => el.dataset.id), startIndex, insertAt);
       const shift = newIndex - startIndex;
@@ -517,7 +535,11 @@ function bindDrag(grip, rowItem) {
           return;
         }
         if (twoColumn) {
-          el.style.transform = "";
+          const removed = index > startIndex ? index - 1 : index;
+          const dest = removed >= newIndex ? removed + 1 : removed;
+          const dx = metrics[dest].left - metrics[index].left;
+          const dy = metrics[dest].top - metrics[index].top;
+          el.style.transform = dx || dy ? `translate(${dx}px, ${dy}px)` : "";
           return;
         }
         let offset = 0;
@@ -539,6 +561,7 @@ function bindDrag(grip, rowItem) {
       grip.removeEventListener("pointermove", move);
       grip.removeEventListener("pointerup", finish);
       grip.removeEventListener("pointercancel", finish);
+      todoList.classList.remove("is-reordering");
       rows.forEach((el) => {
         el.style.transform = "";
       });

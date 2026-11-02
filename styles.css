@@ -344,7 +344,7 @@ button:active {
   padding: 0.15rem 0;
 }
 
-@media (min-width: 501px) {
+@media (min-width: 1001px) {
   .todo-list {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -548,11 +548,16 @@ button:active {
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 
+.todo-list.is-reordering .todo-item {
+  transition: transform 140ms ease;
+}
+
 .todo-item.is-dragging {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   border-radius: 8px;
   background: var(--frame);
+  transition: none;
 }
 
 .todo-item.is-dragging .todo-text {
