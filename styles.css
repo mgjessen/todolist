@@ -218,6 +218,10 @@ h1 {
   width: 100%;
 }
 
+#done-toggle {
+  margin-left: auto;
+}
+
 .clear-warning[hidden] {
   display: none;
 }
