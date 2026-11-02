@@ -344,6 +344,19 @@ button:active {
   padding: 0.15rem 0;
 }
 
+@media (min-width: 501px) {
+  .todo-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: start;
+  }
+
+  .todo-add {
+    grid-column: 1 / -1;
+  }
+}
+
 .todo-item {
   margin: 0;
   padding: 0.22rem 0.15rem;

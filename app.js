@@ -450,14 +450,25 @@ function bindDrag(grip, rowItem) {
     }
     event.preventDefault();
     const pointerId = event.pointerId;
-    grip.setPointerCapture(pointerId);
+      try {
+        grip.setPointerCapture(pointerId);
+      } catch {
+        // A pointer that cannot be captured still reorders on pointerup.
+      }
 
     const rows = [...todoList.querySelectorAll(".todo-item[data-id]")];
     const startIndex = rows.indexOf(rowItem);
+    const twoColumn = getComputedStyle(todoList).gridTemplateColumns.split(" ").length >= 2;
     const metrics = rows.map((el) => {
       const rect = el.getBoundingClientRect();
-      return { el, mid: rect.top + rect.height / 2, height: rect.height };
+      return {
+        el,
+        mid: rect.top + rect.height / 2,
+        midX: rect.left + rect.width / 2,
+        height: rect.height,
+      };
     });
+    const startX = event.clientX;
     const startY = event.clientY;
     const scroller = todoList.closest(".log-scroll");
     const scrollStart = scroller ? scroller.scrollTop : 0;
@@ -470,6 +481,7 @@ function bindDrag(grip, rowItem) {
       }
       const scrollDy = (scroller ? scroller.scrollTop : 0) - scrollStart;
       const pointer = moveEvent.clientY;
+      const pointerX = moveEvent.clientX;
       let insertAt = metrics.length - 1;
       let seen = 0;
       for (let index = 0; index < metrics.length; index += 1) {
@@ -477,7 +489,10 @@ function bindDrag(grip, rowItem) {
           continue;
         }
         const mid = metrics[index].mid - scrollDy;
-        if (pointer < mid) {
+        const before = twoColumn
+          ? pointer > mid + metrics[index].height / 2 || (Math.abs(pointer - mid) <= metrics[index].height / 2 && pointerX > metrics[index].midX)
+          : pointer >= mid;
+        if (!before) {
           insertAt = seen;
           break;
         }
@@ -488,7 +503,13 @@ function bindDrag(grip, rowItem) {
       const shift = newIndex - startIndex;
       rows.forEach((el, index) => {
         if (index === startIndex) {
-          el.style.transform = `translateY(${pointer - startY + scrollDy}px)`;
+          el.style.transform = twoColumn
+            ? `translate(${pointerX - startX}px, ${pointer - startY + scrollDy}px)`
+            : `translateY(${pointer - startY + scrollDy}px)`;
+          return;
+        }
+        if (twoColumn) {
+          el.style.transform = "";
           return;
         }
         let offset = 0;
@@ -670,7 +691,7 @@ function fitToolbar() {
   if (buttons.length < 4) return;
   const gap = parseFloat(getComputedStyle(toolbar).columnGap) || 0;
   const needed = buttons.reduce((sum, button) => sum + button.offsetWidth, 0) + gap * (buttons.length - 1);
-  const line = document.querySelector(".todo-row");
+  const line = document.querySelector(".todo-list");
   const lineWidth = line ? line.getBoundingClientRect().width : toolbar.clientWidth;
   const available = Math.min(lineWidth, toolbar.clientWidth);
   toolbar.classList.toggle("is-stacked", needed > available + 0.5);
