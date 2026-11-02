@@ -125,13 +125,19 @@ h1 {
 }
 
 button {
+  appearance: none;
+  -webkit-appearance: none;
   -webkit-tap-highlight-color: transparent;
 }
 
 button:focus,
 button:focus-visible,
 button:active {
-  outline: none;
+  outline: none !important;
+  outline-width: 0 !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .save-button:focus,

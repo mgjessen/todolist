@@ -639,6 +639,23 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+document.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (button) button.blur();
+});
+
+document.addEventListener("touchstart", (event) => {
+  const button = event.target.closest("button");
+  if (button) button.dataset.touched = "1";
+}, { passive: true });
+
+document.addEventListener("focusin", (event) => {
+  const button = event.target.closest("button");
+  if (!button || button.dataset.touched !== "1") return;
+  delete button.dataset.touched;
+  button.blur();
+});
+
 function alignRowControls() {
   const width = clearButton.getBoundingClientRect().width;
   if (width > 0) {
