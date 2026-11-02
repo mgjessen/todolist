@@ -24,7 +24,7 @@
         document.head.appendChild(theme);
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=24" />
+    <link rel="stylesheet" href="styles.css?v=25" />
   </head>
   <body>
     <main class="app">
@@ -39,18 +39,12 @@
       <section class="log" aria-label="To do list">
         <div class="log-header">
           <div class="log-toolbar">
-            <div class="log-actions-start">
-              <button type="button" id="import-button" class="save-button">Import</button>
-              <button type="button" id="export-button" class="save-button" title="Download the list">
-                Export
-              </button>
-            </div>
-            <div class="log-actions-sort">
-              <button type="button" id="done-place" class="save-button mode-button" aria-pressed="true"><span class="mode-check" aria-hidden="true"></span>Sorted</button>
-              <button type="button" id="sort-alpha" class="save-button mode-button" aria-pressed="false"><span class="mode-check mode-ring" aria-hidden="true"></span>A-Z</button>
-              <button type="button" id="done-bottom" class="save-button mode-button" aria-pressed="false"><span class="mode-check" aria-hidden="true"></span>Bottom</button>
-              <button type="button" id="sort-manual" class="save-button mode-button" aria-pressed="true"><span class="mode-check mode-ring" aria-hidden="true"></span>Sorted</button>
-            </div>
+            <button type="button" id="import-button" class="save-button" title="Import">Imp.</button>
+            <button type="button" id="export-button" class="save-button" title="Export">Exp.</button>
+            <button type="button" id="done-place" class="save-button mode-button" aria-pressed="true" title="Sorted"><span class="mode-check" aria-hidden="true"></span>Sort.</button>
+            <button type="button" id="done-bottom" class="save-button mode-button" aria-pressed="false" title="Bottom"><span class="mode-check" aria-hidden="true"></span>Bot.</button>
+            <button type="button" id="sort-alpha" class="save-button mode-button" aria-pressed="false" title="A-Z"><span class="mode-check mode-ring" aria-hidden="true"></span>A-Z</button>
+            <button type="button" id="sort-manual" class="save-button mode-button" aria-pressed="true" title="Sorted"><span class="mode-check mode-ring" aria-hidden="true"></span>Sort.</button>
           </div>
           <input id="import-input" type="file" accept=".txt,text/plain" hidden />
         </div>

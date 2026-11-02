@@ -141,13 +141,17 @@ h1 {
 .log-toolbar .save-button {
   justify-content: flex-start;
   text-align: left;
+  font-size: 0.75rem;
+  min-height: 1.4rem;
+  padding: 0.12rem 0.4rem;
 }
 
 .mode-check {
   display: inline-grid;
+  flex: none;
   place-items: center;
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 0.9rem;
+  height: 0.9rem;
   border: 1.5px solid color-mix(in srgb, var(--text) 55%, transparent);
   border-radius: 50%;
   color: var(--text);
@@ -195,26 +199,11 @@ h1 {
 .log-toolbar {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.3rem;
   width: 100%;
-}
-
-.log-actions-start {
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.4rem;
-}
-
-.log-actions-sort {
-  display: grid;
-  flex: none;
-  grid-template-columns: auto auto;
-  gap: 0.4rem;
-  justify-items: end;
 }
 
 .clear-warning[hidden] {
