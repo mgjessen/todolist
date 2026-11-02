@@ -1,4 +1,6 @@
 const STORAGE_KEY = "todolist-items";
+const PLACEMENT_KEY = "todolist-done-bottom";
+const SORT_KEY = "todolist-sort";
 
 const exportButton = document.getElementById("export-button");
 const importButton = document.getElementById("import-button");
@@ -17,9 +19,13 @@ const saveStatus = document.getElementById("save-status");
 const todoList = document.getElementById("todo-list");
 
 let editingId = null;
-let doneAtBottom = false;
-let listSort = "manual";
-localStorage.removeItem("todolist-done-bottom");
+let doneAtBottom = localStorage.getItem(PLACEMENT_KEY) === "1";
+let listSort = localStorage.getItem(SORT_KEY) === "alpha" ? "alpha" : "manual";
+
+function rememberView() {
+  localStorage.setItem(PLACEMENT_KEY, doneAtBottom ? "1" : "0");
+  localStorage.setItem(SORT_KEY, listSort === "alpha" ? "alpha" : "manual");
+}
 
 function loadItems() {
   try {
@@ -290,6 +296,7 @@ function exportList() {
 function replaceList(items) {
   editingId = null;
   listSort = "manual";
+  rememberView();
   saveAndShow(items);
   hideSaveStatus();
 }
@@ -373,6 +380,7 @@ function confirmClearList() {
   hideClearWarning();
   editingId = null;
   listSort = "manual";
+  rememberView();
   saveAndShow([]);
   hideSaveStatus();
 }
@@ -544,6 +552,7 @@ function bindDrag(grip, rowItem) {
       const [moved] = visible.splice(startIndex, 1);
       visible.splice(newIndex, 0, moved);
       listSort = "manual";
+      rememberView();
       saveAndShow(mergeDraggedOrder(home, visible));
     };
 
@@ -622,6 +631,7 @@ function setDonePlacement(atBottom) {
     return;
   }
   doneAtBottom = atBottom;
+  rememberView();
   updateDoneButton();
   showItems(withIds(loadItems()));
 }
@@ -634,6 +644,7 @@ function setSortMode(mode) {
     commitEdit();
   }
   listSort = mode;
+  rememberView();
   showItems(withIds(loadItems()));
 }
 
