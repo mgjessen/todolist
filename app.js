@@ -1,5 +1,4 @@
 const STORAGE_KEY = "todolist-items";
-const DONE_BOTTOM_KEY = "todolist-done-bottom";
 
 const exportButton = document.getElementById("export-button");
 const importButton = document.getElementById("import-button");
@@ -18,8 +17,9 @@ const saveStatus = document.getElementById("save-status");
 const todoList = document.getElementById("todo-list");
 
 let editingId = null;
-let doneAtBottom = localStorage.getItem(DONE_BOTTOM_KEY) === "1";
+let doneAtBottom = false;
 let listSort = "manual";
+localStorage.removeItem("todolist-done-bottom");
 
 function loadItems() {
   try {
@@ -601,7 +601,6 @@ function setDonePlacement(atBottom) {
     return;
   }
   doneAtBottom = atBottom;
-  localStorage.setItem(DONE_BOTTOM_KEY, doneAtBottom ? "1" : "0");
   updateDoneButton();
   showItems(withIds(loadItems()));
 }
