@@ -69,7 +69,7 @@ input {
   align-items: center;
   justify-content: flex-end;
   height: 0.95em;
-  font-size: clamp(2.4rem, 1.2rem + 4vw, 4.2rem);
+  font-size: 2.4rem;
 }
 
 .logo img {
@@ -102,7 +102,7 @@ h1 {
   margin: 0;
   min-width: 0;
   color: #222222;
-  font-size: clamp(2.4rem, 1.2rem + 4vw, 4.2rem);
+  font-size: 2.4rem;
   font-weight: 600;
   letter-spacing: -0.045em;
   line-height: 0.95;
