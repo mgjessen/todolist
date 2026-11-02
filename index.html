@@ -24,7 +24,7 @@
         document.head.appendChild(theme);
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=18" />
+    <link rel="stylesheet" href="styles.css?v=19" />
   </head>
   <body>
     <main class="app">
@@ -38,7 +38,13 @@
 
       <section class="log" aria-label="To do list">
         <div class="log-header">
-          <div class="log-actions">
+          <div class="log-toolbar">
+            <div class="log-actions-start">
+              <button type="button" id="import-button" class="save-button">Import</button>
+              <button type="button" id="export-button" class="save-button" title="Download the list">
+                Export
+              </button>
+            </div>
             <div class="log-actions-sort">
               <button type="button" id="done-place" class="save-button mode-button" aria-pressed="true">✔️ in place</button>
               <button type="button" id="done-bottom" class="save-button mode-button" aria-pressed="false">✔️ bottom</button>
@@ -59,17 +65,9 @@
         <div class="log-scroll">
           <ul id="todo-list" class="todo-list"></ul>
         </div>
-        <div class="log-footer">
-          <div class="log-actions-start">
-            <button type="button" id="import-button" class="save-button">Import</button>
-            <button type="button" id="export-button" class="save-button" title="Download the list">
-              Export
-            </button>
-          </div>
-        </div>
       </section>
     </main>
 
-    <script src="app.js?v=19"></script>
+    <script src="app.js?v=20"></script>
   </body>
 </html>
