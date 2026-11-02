@@ -157,6 +157,10 @@ h1 {
   transform: rotate(45deg);
 }
 
+.mode-ring::after {
+  content: none;
+}
+
 .log {
   display: flex;
   flex: 1 1 auto;
