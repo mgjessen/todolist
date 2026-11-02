@@ -583,7 +583,7 @@ function compareAlpha(a, b) {
 }
 
 function updateSortButton() {
-  sortModeButton.textContent = listSort === "alpha" ? "Sorted" : "A-Z";
+  sortModeButton.textContent = listSort === "alpha" ? "◯ sorted" : "◯ a-z";
 }
 
 function updateDoneButton() {
@@ -602,7 +602,7 @@ function applySort() {
   if (editingId) {
     commitEdit();
   }
-  listSort = sortModeButton.textContent === "Sorted" ? "manual" : "alpha";
+  listSort = listSort === "alpha" ? "manual" : "alpha";
   showItems(withIds(loadItems()));
 }
 
