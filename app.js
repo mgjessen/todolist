@@ -4,10 +4,8 @@ const DONE_BOTTOM_KEY = "todolist-done-bottom";
 const exportButton = document.getElementById("export-button");
 const importButton = document.getElementById("import-button");
 const importInput = document.getElementById("import-input");
-const donePlaceButton = document.getElementById("done-place");
-const doneBottomButton = document.getElementById("done-bottom");
-const sortManualButton = document.getElementById("sort-manual");
-const sortAlphaButton = document.getElementById("sort-alpha");
+const doneToggle = document.getElementById("done-toggle");
+const sortToggle = document.getElementById("sort-toggle");
 const clearButton = document.createElement("button");
 clearButton.type = "button";
 clearButton.id = "clear-button";
@@ -584,19 +582,18 @@ function compareAlpha(a, b) {
   return a.text.localeCompare(b.text, undefined, { numeric: true, sensitivity: "base" });
 }
 
-function setPressed(button, pressed) {
-  button.setAttribute("aria-pressed", pressed ? "true" : "false");
+function markMode(button, mode) {
+  button.querySelectorAll(".mode-word").forEach((word) => {
+    word.classList.toggle("is-selected", word.dataset.mode === mode);
+  });
 }
 
 function updateSortButton() {
-  const alpha = listSort === "alpha";
-  setPressed(sortAlphaButton, alpha);
-  setPressed(sortManualButton, !alpha);
+  markMode(sortToggle, listSort === "alpha" ? "alpha" : "manual");
 }
 
 function updateDoneButton() {
-  setPressed(doneBottomButton, doneAtBottom);
-  setPressed(donePlaceButton, !doneAtBottom);
+  markMode(doneToggle, doneAtBottom ? "bottom" : "place");
 }
 
 function setDonePlacement(atBottom) {
@@ -629,10 +626,8 @@ importInput.addEventListener("change", () => {
     importListFile(file);
   }
 });
-donePlaceButton.addEventListener("click", () => setDonePlacement(false));
-doneBottomButton.addEventListener("click", () => setDonePlacement(true));
-sortManualButton.addEventListener("click", () => setSortMode("manual"));
-sortAlphaButton.addEventListener("click", () => setSortMode("alpha"));
+doneToggle.addEventListener("click", () => setDonePlacement(!doneAtBottom));
+sortToggle.addEventListener("click", () => setSortMode(listSort === "alpha" ? "manual" : "alpha"));
 clearButton.addEventListener("click", showClearWarning);
 clearCancel.addEventListener("click", hideClearWarning);
 clearConfirm.addEventListener("click", confirmClearList);

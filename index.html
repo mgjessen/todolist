@@ -24,7 +24,7 @@
         document.head.appendChild(theme);
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=26" />
+    <link rel="stylesheet" href="styles.css?v=27" />
   </head>
   <body>
     <main class="app">
@@ -51,18 +51,18 @@
                 <polyline points="7 3 7 8 15 8" />
               </svg>
             </button>
-            <div class="mode-split">
+            <button type="button" id="done-toggle" class="save-button mode-split">
               <span class="mode-check" aria-hidden="true"></span>
-              <button type="button" id="done-place" class="mode-word" aria-pressed="true" title="Sorted">Sorted</button>
+              <span class="mode-word is-selected" data-mode="place">Sorted</span>
               <span class="mode-slash" aria-hidden="true">/</span>
-              <button type="button" id="done-bottom" class="mode-word" aria-pressed="false" title="Bottom">Bottom</button>
-            </div>
-            <div class="mode-split">
+              <span class="mode-word" data-mode="bottom">Bottom</span>
+            </button>
+            <button type="button" id="sort-toggle" class="save-button mode-split">
               <span class="mode-check mode-ring" aria-hidden="true"></span>
-              <button type="button" id="sort-alpha" class="mode-word" aria-pressed="false" title="A-Z">A-Z</button>
+              <span class="mode-word" data-mode="alpha">A-Z</span>
               <span class="mode-slash" aria-hidden="true">/</span>
-              <button type="button" id="sort-manual" class="mode-word" aria-pressed="true" title="Sorted">Sorted</button>
-            </div>
+              <span class="mode-word is-selected" data-mode="manual">Sorted</span>
+            </button>
           </div>
           <input id="import-input" type="file" accept=".txt,text/plain" hidden />
         </div>
@@ -80,6 +80,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=22"></script>
+    <script src="app.js?v=23"></script>
   </body>
 </html>
