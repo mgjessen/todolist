@@ -124,6 +124,24 @@ h1 {
   background: color-mix(in srgb, var(--fill) 70%, var(--text));
 }
 
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus,
+button:focus-visible,
+button:active {
+  outline: none;
+}
+
+.save-button:focus,
+.save-button:focus-visible,
+.save-button:active,
+.save-button:hover:focus,
+.save-button:hover:active {
+  background: var(--fill);
+}
+
 .log-toolbar .icon-button {
   display: inline-grid;
   place-items: center;
