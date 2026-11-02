@@ -134,7 +134,13 @@ h1 {
 .mode-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.35rem;
+}
+
+.log-toolbar .save-button {
+  justify-content: center;
+  text-align: center;
 }
 
 .mode-check {
