@@ -150,16 +150,10 @@
       overflow: hidden;
     }
 
-    aside.card > h2,
     aside.card > .hint,
     aside.card > .count,
     aside.card > .add-form {
       flex: 0 0 auto;
-    }
-
-    h2 {
-      margin: 0 0 4px;
-      font-size: 1.15rem;
     }
 
     .hint {
@@ -417,8 +411,7 @@
     </header>
 
     <main>
-      <aside class="card" aria-labelledby="recipients-title">
-        <h2 id="recipients-title">Recipients</h2>
+      <aside class="card">
         <p class="count" id="count"></p>
         <ul id="recipients"></ul>
         <form id="add-form" class="add-form" autocomplete="off">
@@ -435,8 +428,7 @@
         </form>
       </aside>
 
-      <section class="card" id="report" aria-labelledby="report-title">
-        <h2 id="report-title">Report</h2>
+      <section class="card" id="report">
         <label class="field subject-field">
           <span class="lab">Subject</span>
           <input id="subject" lang="en" autocomplete="off" spellcheck="false">
