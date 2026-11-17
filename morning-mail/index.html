@@ -505,32 +505,7 @@
     // D5 is Client, D7 is Field.
 
     const RECIPIENTS_KEY = "morning-mail-recipients";
-    const DRAFT_KEY = "morning-mail-draft";
-
-    const SAMPLE = {
-      client: "",
-      rig: "",
-      field: "",
-      well: "",
-      currentService: "",
-      completedService: "",
-      nextService: "",
-      ja: "",
-      zosSap: "",
-      unitPhone: "",
-      zosSapNok: "",
-      dayshift: "",
-      nightshift: "",
-      flex: "",
-      crewchanges: "",
-      hse: "",
-      rigActivity: "",
-      bkrActivity: "",
-      fyi: "",
-      logistics: "",
-      questions: "",
-      wants: ""
-    };
+    const DRAFT_KEY = "morning-mail-draft-v2";
 
     const SEED = [
       { name: "BAADR", email: "", checked: false },
@@ -592,12 +567,24 @@
       document.querySelectorAll("textarea.grow").forEach(autosize);
     }
 
+    function mailFieldElements() {
+      const fields = fieldElements();
+      const phoneAt = fields.findIndex((el) => el.id === "unitPhone");
+      const nokAt = fields.findIndex((el) => el.id === "zosSapNok");
+      if (phoneAt !== -1 && nokAt !== -1 && phoneAt < nokAt) {
+        const [phone] = fields.splice(phoneAt, 1);
+        const afterNok = fields.findIndex((el) => el.id === "zosSapNok");
+        fields.splice(afterNok + 1, 0, phone);
+      }
+      return fields;
+    }
+
     function buildMailTable() {
       const table = document.createElement("table");
       table.setAttribute("cellspacing", "0");
       table.setAttribute("cellpadding", "0");
       table.setAttribute("style", "border-collapse:collapse; font-family:Calibri,Arial,sans-serif; font-size:11pt;");
-      fieldElements().forEach((el) => {
+      mailFieldElements().forEach((el) => {
         const tr = document.createElement("tr");
         const label = document.createElement("td");
         label.setAttribute("style", "font-weight:bold; text-align:right; vertical-align:top; padding:2px 16px 2px 0; white-space:nowrap;");
@@ -752,23 +739,16 @@
       });
     }
 
-    function applyDraftOrSample() {
+    function applyDraft() {
       const draft = loadJson(DRAFT_KEY);
-      if (draft && draft.values && typeof draft.values === "object" && !Array.isArray(draft.values)) {
-        fieldElements().forEach((el) => {
-          if (typeof draft.values[el.id] === "string") el.value = draft.values[el.id];
-        });
-        subjectTouched = draft.subjectTouched === true;
-        subjectEl.value = subjectTouched && typeof draft.subject === "string"
-          ? draft.subject
-          : patternSubject();
-        return;
-      }
+      if (!draft || !draft.values || typeof draft.values !== "object" || Array.isArray(draft.values)) return;
       fieldElements().forEach((el) => {
-        if (Object.prototype.hasOwnProperty.call(SAMPLE, el.id)) el.value = SAMPLE[el.id];
+        if (typeof draft.values[el.id] === "string") el.value = draft.values[el.id];
       });
-      subjectTouched = false;
-      subjectEl.value = patternSubject();
+      subjectTouched = draft.subjectTouched === true;
+      subjectEl.value = subjectTouched && typeof draft.subject === "string"
+        ? draft.subject
+        : patternSubject();
     }
 
     function noteLines() {
@@ -1036,7 +1016,7 @@
 
     window.addEventListener("resize", refresh);
 
-    applyDraftOrSample();
+    applyDraft();
     renderRecipients();
   </script>
 </body>
