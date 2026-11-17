@@ -197,20 +197,12 @@
 
     .identity { min-width: 0; }
 
-    .name,
-    .addr {
+    .name {
       display: block;
       overflow-wrap: break-word;
     }
 
     .name { font-weight: 650; }
-
-    .addr {
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
-
-    .addr.missing { color: var(--warn); }
 
     .actions {
       display: flex;
@@ -831,14 +823,6 @@
       name.className = "name";
       appendBreakable(name, rec.name);
       identity.append(name);
-      const same = rec.email && rec.name.trim().toLowerCase() === rec.email.trim().toLowerCase();
-      if (!same) {
-        const addr = document.createElement("span");
-        addr.className = "addr" + (rec.email ? "" : " missing");
-        if (rec.email) appendBreakable(addr, rec.email);
-        else addr.textContent = "Missing email";
-        identity.append(addr);
-      }
       label.append(box, identity);
 
       const actions = document.createElement("div");
