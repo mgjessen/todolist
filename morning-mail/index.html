@@ -524,7 +524,7 @@
     const SEED = [
       { name: "BAADR", email: "BAADR@bakerhughes.com", checked: false },
       { name: "Duty Manager", email: "DutyManagerBAStv@bakerhughes.com", checked: false },
-      { name: "altus_altus-ops@bakerhughes.com", email: "altus_altus-ops@bakerhughes.com", checked: true }
+      { name: "Altus Ops", email: "altus_altus-ops@bakerhughes.com", checked: true }
     ];
 
     const subjectEl = document.getElementById("subject");
@@ -739,6 +739,10 @@
         }
         if (rec.name === "BAADR" && rec.email === "") {
           rec.email = "BAADR@bakerhughes.com";
+          changed = true;
+        }
+        if ((rec.email === "altus_altus-ops@bakerhughes.com" || rec.name === "altus_altus-ops@bakerhughes.com") && rec.name !== "Altus Ops") {
+          rec.name = "Altus Ops";
           changed = true;
         }
       });
