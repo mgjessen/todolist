@@ -151,7 +151,6 @@
     }
 
     aside.card > .hint,
-    aside.card > .count,
     aside.card > .add-form {
       flex: 0 0 auto;
     }
@@ -163,10 +162,12 @@
     }
 
     .count {
-      margin: 0 0 8px;
-      font-size: 0.88rem;
+      margin: 0;
+      max-width: 22rem;
+      font-size: 0.92rem;
       font-weight: 650;
       color: var(--send);
+      text-align: right;
     }
 
     #recipients {
@@ -388,7 +389,7 @@
     @media (max-width: 720px) {
       .page { padding: 8px 14px 36px; }
       header { flex-direction: column; }
-      .send-cluster, .notes { align-items: stretch; text-align: left; max-width: none; }
+      .send-cluster, .notes, .count { align-items: stretch; text-align: left; max-width: none; }
       .send-row { width: 100%; }
       button.send { flex: 1; }
       .grid, .grid-3, .grid-even { grid-template-columns: 1fr; }
@@ -406,13 +407,13 @@
           <button id="clear" class="clear" type="button">Clear</button>
           <button id="send" class="send" type="button">Create .eml</button>
         </div>
+        <p class="count" id="count"></p>
         <ul id="notes" class="notes" aria-live="polite" hidden></ul>
       </div>
     </header>
 
     <main>
       <aside class="card">
-        <p class="count" id="count"></p>
         <ul id="recipients"></ul>
         <form id="add-form" class="add-form" autocomplete="off">
           <label class="field">
