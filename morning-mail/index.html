@@ -102,15 +102,16 @@
 
     button.clear {
       padding: 0.8rem 1.1rem;
-      border: 1px solid var(--line-strong);
+      border: 0;
       border-radius: 8px;
-      background: #fff;
-      color: var(--ink);
+      background: #c42b1c;
+      color: #fff;
       font-size: 1.1rem;
       font-weight: 650;
     }
 
-    button.clear:hover { background: #f0f0f0; }
+    button.clear:hover { background: #a82418; color: #fff; }
+    button.clear:active { background: #8c1d14; }
 
     button.send:hover { background: var(--send-hover); color: #fff; }
     button.send:active { background: #062433; }
@@ -1044,7 +1045,10 @@
     });
 
     sendEl.addEventListener("click", openOutlookDraft);
-    document.getElementById("clear").addEventListener("click", clearReport);
+    document.getElementById("clear").addEventListener("click", () => {
+      if (!window.confirm("Clear all fields?")) return;
+      clearReport();
+    });
 
     window.addEventListener("resize", refresh);
 
