@@ -94,6 +94,24 @@
       letter-spacing: 0.01em;
     }
 
+    .send-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button.clear {
+      padding: 0.8rem 1.1rem;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 1.1rem;
+      font-weight: 650;
+    }
+
+    button.clear:hover { background: #f0f0f0; }
+
     button.send:hover { background: var(--send-hover); color: #fff; }
     button.send:active { background: #062433; }
 
@@ -376,7 +394,8 @@
       .page { padding: 8px 14px 36px; }
       header { flex-direction: column; }
       .send-cluster, .notes { align-items: stretch; text-align: left; max-width: none; }
-      button.send { width: 100%; }
+      .send-row { width: 100%; }
+      button.send { flex: 1; }
       .grid, .grid-3, .grid-even { grid-template-columns: 1fr; }
     }
   </style>
@@ -388,7 +407,10 @@
         <h1>Morning Report</h1>
       </div>
       <div class="send-cluster">
-        <button id="send" class="send" type="button">Send</button>
+        <div class="send-row">
+          <button id="clear" class="clear" type="button">Clear</button>
+          <button id="send" class="send" type="button">Send</button>
+        </div>
         <ul id="notes" class="notes" aria-live="polite" hidden></ul>
       </div>
     </header>
@@ -718,6 +740,16 @@
       persist(RECIPIENTS_KEY, recipients);
     }
 
+    function clearReport() {
+      fieldElements().forEach((el) => {
+        el.value = "";
+      });
+      subjectTouched = false;
+      subjectEl.value = "";
+      saveDraft();
+      refresh();
+    }
+
     function saveDraft() {
       const values = {};
       fieldElements().forEach((el) => {
@@ -996,6 +1028,7 @@
     });
 
     sendEl.addEventListener("click", openOutlookDraft);
+    document.getElementById("clear").addEventListener("click", clearReport);
 
     window.addEventListener("resize", refresh);
 
