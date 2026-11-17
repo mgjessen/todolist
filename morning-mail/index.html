@@ -521,9 +521,8 @@
     const DRAFT_KEY = "morning-mail-draft-v2";
 
     const SEED = [
-      { name: "BAADR", email: "", checked: false },
+      { name: "BAADR", email: "BAADR@bakerhughes.com", checked: false },
       { name: "Duty Manager", email: "DutyManagerBAStv@bakerhughes.com", checked: false },
-      { name: "Crew", email: "", checked: false },
       { name: "altus_altus-ops@bakerhughes.com", email: "altus_altus-ops@bakerhughes.com", checked: true }
     ];
 
@@ -730,12 +729,19 @@
       const list = data
         .map(freshRecipient)
         .filter((rec) => rec.name || rec.email);
-      const kept = list.filter((rec) => !(rec.name === "Personnel Planner" && rec.email === ""));
+      const kept = list.filter((rec) => {
+        if (rec.email !== "") return true;
+        return rec.name !== "Personnel Planner" && rec.name !== "Crew";
+      });
       let changed = kept.length !== list.length;
       kept.forEach((rec) => {
         if (rec.name === "Duty Manager Stv") {
           rec.name = "Duty Manager";
           rec.email = "DutyManagerBAStv@bakerhughes.com";
+          changed = true;
+        }
+        if (rec.name === "BAADR" && rec.email === "") {
+          rec.email = "BAADR@bakerhughes.com";
           changed = true;
         }
       });
