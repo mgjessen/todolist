@@ -524,7 +524,6 @@
       { name: "BAADR", email: "", checked: false },
       { name: "Duty Manager Stv", email: "", checked: false },
       { name: "Crew", email: "", checked: false },
-      { name: "Personnel Planner", email: "", checked: false },
       { name: "altus_altus-ops@bakerhughes.com", email: "altus_altus-ops@bakerhughes.com", checked: true }
     ];
 
@@ -728,9 +727,12 @@
     function loadRecipients() {
       const data = loadJson(RECIPIENTS_KEY);
       if (!Array.isArray(data)) return null;
-      return data
+      const list = data
         .map(freshRecipient)
         .filter((rec) => rec.name || rec.email);
+      const kept = list.filter((rec) => !(rec.name === "Personnel Planner" && rec.email === ""));
+      if (kept.length !== list.length) persist(RECIPIENTS_KEY, kept);
+      return kept;
     }
 
     let recipients = loadRecipients();
