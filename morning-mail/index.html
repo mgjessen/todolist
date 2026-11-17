@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Morning report</title>
+  <title>Morning Report</title>
   <style>
     :root {
-      --bg: #e7e1d6;
-      --card: #fffcf8;
-      --ink: #1c2421;
-      --muted: #4e5b56;
-      --line: #e3dbd0;
-      --line-strong: #d3c9bb;
+      --bg: #f3f3f3;
+      --card: #ffffff;
+      --ink: #1a1a1a;
+      --muted: #5d5d5d;
+      --line: #e5e5e5;
+      --line-strong: #d1d1d1;
       --send: #0c4a6e;
       --send-hover: #08344e;
       --focus: #0c4a6e;
@@ -52,8 +52,6 @@
       margin: 0;
       font-size: 1.6rem;
       letter-spacing: -0.02em;
-      padding-left: 12px;
-      border-left: 4px solid #c45c26;
     }
 
     .lede {
@@ -173,11 +171,11 @@
       align-items: flex-start;
       gap: 4px 8px;
       padding: 8px 6px;
-      border-bottom: 1px solid #f0ebe3;
+      border-bottom: 1px solid #ededed;
       border-radius: 8px;
     }
 
-    .recipient.is-checked { background: #f3f7f5; }
+    .recipient.is-checked { background: #f5f5f5; }
 
     .check {
       display: flex;
@@ -236,7 +234,7 @@
       font-size: 0.85rem;
     }
 
-    .ghost:hover { background: #f3eee6; }
+    .ghost:hover { background: #f0f0f0; }
     .ghost.danger { color: var(--danger); }
 
     li.empty {
@@ -308,7 +306,7 @@
     .group h3 {
       margin: 0 0 10px;
       font-size: 0.95rem;
-      color: #3d4a45;
+      color: #3b3b3b;
     }
 
     .grid {
@@ -364,7 +362,7 @@
     }
 
     #preview {
-      background: #f6f3ee;
+      background: #f7f7f7;
       border-radius: 8px;
       padding: 12px;
       margin: 10px 0 0;
@@ -395,19 +393,17 @@
   <div class="page">
     <header>
       <div>
-        <h1>Morning report</h1>
-        <p class="lede">Send opens this report in Outlook as a draft. You send it from there. Recipients and the text you type stay in this browser.</p>
+        <h1>Morning Report</h1>
       </div>
       <div class="send-cluster">
-        <ul id="notes" class="notes" aria-live="polite" hidden></ul>
         <button id="send" class="send" type="button">Send</button>
+        <ul id="notes" class="notes" aria-live="polite" hidden></ul>
       </div>
     </header>
 
     <main>
       <aside class="card" aria-labelledby="recipients-title">
         <h2 id="recipients-title">Recipients</h2>
-        <p class="hint">Check who gets this morning's mail.</p>
         <p class="count" id="count"></p>
         <ul id="recipients"></ul>
         <form id="add-form" class="add-form" autocomplete="off">
@@ -433,7 +429,6 @@
         <p class="hint">Follows Client and Field. A subject you type yourself stays as written.</p>
 
         <div class="group" data-group>
-          <h3>Location</h3>
           <div class="grid">
             <label class="field"><span class="lab">Client:</span><input id="client" data-label="Client" lang="en" autocomplete="off" spellcheck="false"></label>
             <label class="field"><span class="lab">Rig:</span><input id="rig" data-label="Rig" lang="en" autocomplete="off" spellcheck="false"></label>
@@ -443,7 +438,6 @@
         </div>
 
         <div class="group" data-group>
-          <h3>Service</h3>
           <div class="grid">
             <label class="field wide"><span class="lab">Current Service:</span><textarea id="currentService" class="grow" data-label="Current Service" lang="en" rows="1" spellcheck="true"></textarea></label>
             <label class="field wide"><span class="lab">Completed Service:</span><textarea id="completedService" class="grow" data-label="Completed Service" lang="en" rows="1" spellcheck="true"></textarea></label>
@@ -452,16 +446,15 @@
         </div>
 
         <div class="group" data-group>
-          <h3>Numbers</h3>
           <div class="grid">
             <label class="field"><span class="lab">JA:</span><input id="ja" data-label="JA" lang="en" autocomplete="off" spellcheck="false"></label>
-            <label class="field wide"><span class="lab">ZOS/SAP:</span><textarea id="zosSap" class="grow" data-label="ZOS/SAP" lang="en" rows="1" spellcheck="false"></textarea></label>
-            <label class="field wide"><span class="lab">Unit Phone Number:</span><input id="unitPhone" data-label="Unit Phone Number" lang="en" autocomplete="off" spellcheck="false" inputmode="tel"></label>
+            <label class="field"><span class="lab">ZOS/SAP (USD):</span><textarea id="zosSap" class="grow" data-label="ZOS/SAP (USD)" lang="en" rows="1" spellcheck="false"></textarea></label>
+            <label class="field"><span class="lab">Unit Phone Number:</span><input id="unitPhone" data-label="Unit Phone Number" lang="en" autocomplete="off" spellcheck="false" inputmode="tel"></label>
+            <label class="field"><span class="lab">ZOS/SAP (NOK):</span><textarea id="zosSapNok" class="grow" data-label="ZOS/SAP (NOK)" lang="en" rows="1" spellcheck="false"></textarea></label>
           </div>
         </div>
 
         <div class="group" data-group>
-          <h3>Crew</h3>
           <div class="grid">
             <label class="field wide"><span class="lab">Dayshift:</span><textarea id="dayshift" class="grow" data-label="Dayshift" lang="en" rows="1" spellcheck="true"></textarea></label>
             <label class="field wide"><span class="lab">Nightshift:</span><textarea id="nightshift" class="grow" data-label="Nightshift" lang="en" rows="1" spellcheck="true"></textarea></label>
@@ -471,14 +464,12 @@
         </div>
 
         <div class="group" data-group>
-          <h3>HSE</h3>
           <div class="grid">
             <label class="field wide"><span class="lab">HSE:</span><textarea id="hse" class="grow" data-label="HSE" lang="en" rows="1" spellcheck="true"></textarea></label>
           </div>
         </div>
 
         <div class="group" data-group>
-          <h3>Activity</h3>
           <div class="grid">
             <label class="field wide"><span class="lab">Rig Activity:</span><textarea id="rigActivity" class="grow" data-label="Rig Activity" lang="en" rows="1" spellcheck="true"></textarea></label>
             <label class="field wide"><span class="lab">BKR Activity:</span><textarea id="bkrActivity" class="grow" data-label="BKR Activity" lang="en" rows="1" spellcheck="true"></textarea></label>
@@ -486,7 +477,6 @@
         </div>
 
         <div class="group" data-group>
-          <h3>Other</h3>
           <div class="grid">
             <label class="field wide"><span class="lab">FYI:</span><textarea id="fyi" class="grow" data-label="FYI" lang="en" rows="1" spellcheck="true"></textarea></label>
             <label class="field wide"><span class="lab">Logistics:</span><textarea id="logistics" class="grow" data-label="Logistics" lang="en" rows="1" spellcheck="true"></textarea></label>
@@ -518,46 +508,28 @@
     const DRAFT_KEY = "morning-mail-draft";
 
     const SAMPLE = {
-      client: "Equinor ASA",
-      rig: "Snorre A",
-      field: "Snorre",
-      well: "34/7-P-9 A",
-      currentService: "Stand by",
-      completedService: [
-        "Perf run 1: 24.5 hours",
-        "Perf run 2: 17 hours",
-        "Perf run 3: 15.25 hours",
-        "Perf run 4: 14.5 hours",
-        "Perf run 5: 17.25 hours",
-        "Perf run 6: 16.00 hours",
-        "Perf run 7: 17.75 hours",
-        "Perf run 8: 14:25 hours",
-        "Perf run 9: 17.25 hours",
-        "Perf run 10: 16.25 hours",
-        "Perf run 11:"
-      ].join("\n"),
-      nextService: [
-        '"Altus" fishing operation.',
-        "1 runs 2-7/8 perforation (might be cancelled)",
-        "10 runs 3-3/8 perforation"
-      ].join("\n"),
-      ja: "605121",
-      zosSap: "113073019 / 908837417",
-      unitPhone: "51573362",
-      dayshift: "K. Selboe, J. Warda",
-      nightshift: "M. Gjessen, M. Watson",
-      flex: "-",
-      crewchanges: [
-        "M. Gjessen going in, M. Watson taking over.",
-        "J. Gjertsen coming out to take over for M. Watson."
-      ].join("\n"),
-      hse: "Following rig program. 1x card per day. Nothing to report.",
-      rigActivity: "Wireline preparing for fishing.",
-      bkrActivity: 'Released the stuck toolstring. First release lower RSS, but tractor was still stuck. Release upper RSS and pulled out of hole. "Altus" now preparing for fishing operation, which is likely next step.',
-      fyi: "-",
-      logistics: "-",
-      questions: "-",
-      wants: "-"
+      client: "",
+      rig: "",
+      field: "",
+      well: "",
+      currentService: "",
+      completedService: "",
+      nextService: "",
+      ja: "",
+      zosSap: "",
+      unitPhone: "",
+      zosSapNok: "",
+      dayshift: "",
+      nightshift: "",
+      flex: "",
+      crewchanges: "",
+      hse: "",
+      rigActivity: "",
+      bkrActivity: "",
+      fyi: "",
+      logistics: "",
+      questions: "",
+      wants: ""
     };
 
     const SEED = [
@@ -602,6 +574,7 @@
     function patternSubject() {
       const client = valueOf(document.getElementById("client"));
       const field = valueOf(document.getElementById("field"));
+      if (!client && !field) return "";
       return "NO - " + client + " - " + field + " - Morning Report";
     }
 
