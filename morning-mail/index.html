@@ -410,7 +410,7 @@
       <div class="send-cluster">
         <div class="send-row">
           <button id="clear" class="clear" type="button">Clear</button>
-          <button id="send" class="send" type="button">Send</button>
+          <button id="send" class="send" type="button">Create .eml</button>
         </div>
         <ul id="notes" class="notes" aria-live="polite" hidden></ul>
       </div>
@@ -563,10 +563,6 @@
       const field = valueOf(document.getElementById("field"));
       if (!client && !field) return "";
       return "NO - " + client + " - " + field + " - Morning Report";
-    }
-
-    function bodyIsEmpty() {
-      return !fieldElements().some((el) => valueOf(el) !== "");
     }
 
     function autosize(el) {
@@ -746,14 +742,26 @@
           changed = true;
         }
       });
-      if (changed) persist(RECIPIENTS_KEY, kept);
+      const before = kept.map((rec) => rec.id).join("\0");
+      sortRecipients(kept);
+      if (changed || kept.map((rec) => rec.id).join("\0") !== before) persist(RECIPIENTS_KEY, kept);
       return kept;
     }
 
+    function byName(a, b) {
+      return a.name.localeCompare(b.name, "en", { sensitivity: "base" });
+    }
+
+    function sortRecipients(list) {
+      list.sort(byName);
+      return list;
+    }
+
     let recipients = loadRecipients();
-    if (recipients === null) recipients = SEED.map(freshRecipient);
+    if (recipients === null) recipients = sortRecipients(SEED.map(freshRecipient));
 
     function saveRecipients() {
+      sortRecipients(recipients);
       persist(RECIPIENTS_KEY, recipients);
     }
 
@@ -763,8 +771,12 @@
       });
       subjectTouched = false;
       subjectEl.value = "";
+      recipients.forEach((rec) => {
+        rec.checked = false;
+      });
+      saveRecipients();
       saveDraft();
-      refresh();
+      renderRecipients();
     }
 
     function saveDraft() {
@@ -792,17 +804,9 @@
     }
 
     function noteLines() {
-      const lines = [];
-      if (subjectEl.value.trim() === "") lines.push("The subject is empty.");
-      if (bodyIsEmpty()) lines.push("The message is empty.");
-      const checked = recipients.filter((rec) => rec.checked);
-      if (checked.length === 0) lines.push("No recipients are checked.");
-      const missing = checked.filter((rec) => !rec.email.trim());
-      if (missing.length) {
-        lines.push("Missing an email address, left out: " + missing.map((rec) => rec.name).join(", "));
-      }
-      if (!storageOk) lines.push("Could not save in this browser.");
-      return lines;
+      const missing = recipients.filter((rec) => rec.checked && !rec.email.trim());
+      if (!missing.length) return [];
+      return ["Missing an email address, left out: " + missing.map((rec) => rec.name).join(", ")];
     }
 
     function refresh() {
@@ -832,6 +836,7 @@
     }
 
     function renderRecipients() {
+      sortRecipients(recipients);
       listEl.replaceChildren();
       if (!recipients.length) {
         const empty = document.createElement("li");
