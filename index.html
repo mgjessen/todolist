@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2" />
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=2" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2" />
-    <link rel="manifest" href="manifest.json?v=2" />
+    <link rel="manifest" href="manifest.json?v=3" />
     <meta name="apple-mobile-web-app-title" content="To Do List" />
     <script>
       (function () {
@@ -17,14 +17,26 @@
           /Windows/i.test(navigator.userAgent || "") ||
           /Win/i.test(navigator.platform || "") ||
           (data && /Windows/i.test(data.platform || ""));
-        if (windows) return;
+        if (windows) {
+          var lightBar = document.createElement("meta");
+          lightBar.name = "theme-color";
+          lightBar.media = "(prefers-color-scheme: light)";
+          lightBar.content = "#f5f5f7";
+          var darkBar = document.createElement("meta");
+          darkBar.name = "theme-color";
+          darkBar.media = "(prefers-color-scheme: dark)";
+          darkBar.content = "#1c1c1e";
+          document.head.appendChild(lightBar);
+          document.head.appendChild(darkBar);
+          return;
+        }
         var theme = document.createElement("meta");
         theme.name = "theme-color";
         theme.content = "#FF5500";
         document.head.appendChild(theme);
       })();
     </script>
-    <link rel="stylesheet" href="styles.css?v=34" />
+    <link rel="stylesheet" href="styles.css?v=35" />
   </head>
   <body>
     <main class="app">
