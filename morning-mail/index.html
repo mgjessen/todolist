@@ -522,7 +522,7 @@
 
     const SEED = [
       { name: "BAADR", email: "", checked: false },
-      { name: "Duty Manager Stv", email: "", checked: false },
+      { name: "Duty Manager", email: "DutyManagerBAStv@bakerhughes.com", checked: false },
       { name: "Crew", email: "", checked: false },
       { name: "altus_altus-ops@bakerhughes.com", email: "altus_altus-ops@bakerhughes.com", checked: true }
     ];
@@ -731,7 +731,15 @@
         .map(freshRecipient)
         .filter((rec) => rec.name || rec.email);
       const kept = list.filter((rec) => !(rec.name === "Personnel Planner" && rec.email === ""));
-      if (kept.length !== list.length) persist(RECIPIENTS_KEY, kept);
+      let changed = kept.length !== list.length;
+      kept.forEach((rec) => {
+        if (rec.name === "Duty Manager Stv") {
+          rec.name = "Duty Manager";
+          rec.email = "DutyManagerBAStv@bakerhughes.com";
+          changed = true;
+        }
+      });
+      if (changed) persist(RECIPIENTS_KEY, kept);
       return kept;
     }
 
