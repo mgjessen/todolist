@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Morgenrapport</title>
+  <style>
+    :root {
+      --bg: #e7e1d6;
+      --card: #fffcf8;
+      --ink: #1c2421;
+      --muted: #4e5b56;
+      --line: #e3dbd0;
+      --line-strong: #d3c9bb;
+      --send: #0c4a6e;
+      --send-hover: #08344e;
+      --focus: #0c4a6e;
+      --warn: #7a3e12;
+      --danger: #8c2f2f;
+      --stick-top: 96px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.45 "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 8px 24px 48px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px 28px;
+      padding: 16px 0 14px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line-strong);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      letter-spacing: -0.02em;
+      padding-left: 12px;
+      border-left: 4px solid #c45c26;
+    }
+
+    .lede {
+      margin: 6px 0 0;
+      max-width: 42rem;
+      color: var(--muted);
+    }
+
+    .send-cluster {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .notes {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      text-align: right;
+      color: var(--warn);
+      font-size: 0.92rem;
+      max-width: 22rem;
+    }
+
+    .notes li + li { margin-top: 2px; }
+
+    a.send,
+    a.send:visited {
+      display: inline-block;
+      min-width: 9.5rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      background: var(--send);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      letter-spacing: 0.01em;
+    }
+
+    a.send:hover { background: var(--send-hover); color: #fff; }
+    a.send:active { background: #062433; }
+
+    a.send:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    summary:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+      margin-top: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      min-width: 0;
+    }
+
+    aside.card {
+      position: sticky;
+      top: var(--stick-top);
+      display: flex;
+      flex-direction: column;
+      max-height: calc(100vh - var(--stick-top) - 16px);
+      overflow: hidden;
+    }
+
+    aside.card > h2,
+    aside.card > .hint,
+    aside.card > .count,
+    aside.card > .add-form {
+      flex: 0 0 auto;
+    }
+
+    h2 {
+      margin: 0 0 4px;
+      font-size: 1.15rem;
+    }
+
+    .hint {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .count {
+      margin: 0 0 8px;
+      font-size: 0.88rem;
+      font-weight: 650;
+      color: var(--send);
+    }
+
+    #recipients {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      overflow: auto;
+      min-height: 0;
+      flex: 1 1 auto;
+    }
+
+    .recipient {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 4px 8px;
+      padding: 8px 6px;
+      border-bottom: 1px solid #f0ebe3;
+      border-radius: 8px;
+    }
+
+    .recipient.is-checked { background: #f3f7f5; }
+
+    .check {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+      font-weight: 400;
+    }
+
+    .check input {
+      width: 1.05rem;
+      height: 1.05rem;
+      margin-top: 3px;
+      accent-color: var(--send);
+      flex: 0 0 auto;
+    }
+
+    .identity { min-width: 0; }
+
+    .name,
+    .addr {
+      display: block;
+      overflow-wrap: break-word;
+    }
+
+    .name { font-weight: 650; }
+
+    .addr {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .addr.missing { color: var(--warn); }
+
+    .actions {
+      display: flex;
+      gap: 2px;
+      margin-left: auto;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .ghost {
+      background: transparent;
+      border: 0;
+      color: var(--send);
+      border-radius: 6px;
+      padding: 4px 6px;
+      font-size: 0.85rem;
+    }
+
+    .ghost:hover { background: #f3eee6; }
+    .ghost.danger { color: var(--danger); }
+
+    li.empty {
+      display: block;
+      color: var(--muted);
+      padding: 8px 4px 12px;
+    }
+
+    .add-form,
+    .edit-form {
+      display: grid;
+      gap: 8px;
+    }
+
+    .add-form {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .edit-form,
+    .confirm-row { flex: 1 1 100%; }
+
+    .confirm-text { margin: 4px 0; font-weight: 650; }
+
+    .edit-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    button.secondary,
+    button.quiet {
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-weight: 650;
+    }
+
+    button.secondary {
+      background: var(--send);
+      color: #fff;
+      border: 0;
+      justify-self: start;
+    }
+
+    button.secondary:hover { background: var(--send-hover); }
+
+    button.quiet {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line-strong);
+    }
+
+    button.danger-solid {
+      background: var(--danger);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-weight: 650;
+    }
+
+    .form-error {
+      margin: 0;
+      color: var(--danger);
+      font-size: 0.88rem;
+    }
+
+    .subject-field { margin: 8px 0 4px; }
+
+    .group + .group { margin-top: 20px; }
+
+    .group h3 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      color: #3d4a45;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 16px;
+    }
+
+    .grid-3 { grid-template-columns: 0.7fr 1.4fr 1fr; }
+    .grid-even { grid-template-columns: 1fr 1fr 1fr; }
+
+    .wide { grid-column: 1 / -1; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.92rem;
+      font-weight: 650;
+      min-width: 0;
+    }
+
+    .field input,
+    .field textarea {
+      font: inherit;
+      font-weight: 450;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      padding: 8px 10px;
+      width: 100%;
+    }
+
+    .field textarea {
+      resize: vertical;
+      line-height: 1.4;
+    }
+
+    .preview {
+      margin-top: 18px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    .preview summary {
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .preview pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font: inherit;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      background: #f6f3ee;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 10px 0 0;
+      min-height: 2.5rem;
+    }
+
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      aside.card {
+        position: static;
+        max-height: none;
+        overflow: visible;
+      }
+      .grid-3, .grid-even { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .page { padding: 8px 14px 36px; }
+      header { flex-direction: column; }
+      .send-cluster, .notes { align-items: stretch; text-align: left; max-width: none; }
+      a.send { width: 100%; }
+      .grid, .grid-3, .grid-even { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <h1>Morgenrapport</h1>
+        <p class="lede">Send åpner Outlook med mottakere, emne og tekst. Du sender e-posten derfra. Mottakerlisten og det du skriver lagres i denne nettleseren.</p>
+      </div>
+      <div class="send-cluster">
+        <ul id="notes" class="notes" aria-live="polite" hidden></ul>
+        <a id="send" class="send" href="mailto:?subject=&amp;body=">Send</a>
+      </div>
+    </header>
+
+    <main>
+      <aside class="card" aria-labelledby="recipients-title">
+        <h2 id="recipients-title">Mottakere</h2>
+        <p class="hint">Kryss av for hvem som får e-posten i dag.</p>
+        <p class="count" id="count"></p>
+        <ul id="recipients"></ul>
+        <form id="add-form" class="add-form" autocomplete="off">
+          <label class="field">
+            <span class="lab">Navn</span>
+            <input id="add-name" name="name" autocomplete="name">
+          </label>
+          <label class="field">
+            <span class="lab">E-post</span>
+            <input id="add-email" name="email" inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="email" placeholder="navn@firma.no">
+          </label>
+          <p id="add-error" class="form-error" hidden></p>
+          <button class="secondary" type="submit">Legg til</button>
+        </form>
+      </aside>
+
+      <section class="card" id="report" aria-labelledby="report-title">
+        <h2 id="report-title">Rapport</h2>
+        <label class="field subject-field">
+          <span class="lab">Emne</span>
+          <input id="subject" lang="en" autocomplete="off" spellcheck="false">
+        </label>
+        <p class="hint">Oppdateres fra Client og Field. Endrer du emnet selv, blir det stående.</p>
+
+        <div class="group" data-group>
+          <h3>Sted og brønn</h3>
+          <div class="grid">
+            <label class="field"><span class="lab">Client:</span><input id="client" data-label="Client" lang="en" autocomplete="off" spellcheck="false"></label>
+            <label class="field"><span class="lab">Rig:</span><input id="rig" data-label="Rig" lang="en" autocomplete="off" spellcheck="false"></label>
+            <label class="field"><span class="lab">Field:</span><input id="field" data-label="Field" lang="en" autocomplete="off" spellcheck="false"></label>
+            <label class="field"><span class="lab">Well:</span><input id="well" data-label="Well" lang="en" autocomplete="off" spellcheck="false"></label>
+          </div>
+        </div>
+
+        <div class="group" data-group>
+          <h3>Tjeneste</h3>
+          <div class="grid">
+            <label class="field wide"><span class="lab">Current Service:</span><input id="currentService" data-label="Current Service" lang="en" autocomplete="off"></label>
+            <label class="field wide"><span class="lab">Completed Service:</span><textarea id="completedService" data-label="Completed Service" data-multiline="true" lang="en" rows="11" spellcheck="true"></textarea></label>
+            <label class="field wide"><span class="lab">Next Service:</span><textarea id="nextService" data-label="Next Service" data-multiline="true" lang="en" rows="4" spellcheck="true"></textarea></label>
+          </div>
+        </div>
+
+        <div class="group" data-group>
+          <h3>Nummer</h3>
+          <div class="grid grid-3">
+            <label class="field"><span class="lab">JA:</span><input id="ja" data-label="JA" lang="en" autocomplete="off" spellcheck="false"></label>
+            <label class="field"><span class="lab">ZOS/SAP:</span><input id="zosSap" data-label="ZOS/SAP" lang="en" autocomplete="off" spellcheck="false"></label>
+            <label class="field"><span class="lab">Unit Phone Number:</span><input id="unitPhone" data-label="Unit Phone Number" lang="en" autocomplete="off" spellcheck="false" inputmode="tel"></label>
+          </div>
+        </div>
+
+        <div class="group" data-group>
+          <h3>Mannskap</h3>
+          <div class="grid grid-even">
+            <label class="field"><span class="lab">Dayshift:</span><input id="dayshift" data-label="Dayshift" lang="en" autocomplete="off" spellcheck="false"></label>
+            <label class="field"><span class="lab">Nightshift:</span><input id="nightshift" data-label="Nightshift" lang="en" autocomplete="off" spellcheck="false"></label>
+            <label class="field"><span class="lab">Flex:</span><input id="flex" data-label="Flex" lang="en" autocomplete="off" spellcheck="false"></label>
+            <label class="field wide"><span class="lab">Crewchanges:</span><textarea id="crewchanges" data-label="Crewchanges" data-multiline="true" lang="en" rows="3" spellcheck="true"></textarea></label>
+          </div>
+        </div>
+
+        <div class="group" data-group>
+          <h3>HMS</h3>
+          <div class="grid">
+            <label class="field wide"><span class="lab">HSE:</span><textarea id="hse" data-label="HSE" lang="en" rows="2" spellcheck="true"></textarea></label>
+          </div>
+        </div>
+
+        <div class="group" data-group>
+          <h3>Aktivitet</h3>
+          <div class="grid">
+            <label class="field wide"><span class="lab">Rig Activity:</span><textarea id="rigActivity" data-label="Rig Activity" lang="en" rows="2" spellcheck="true"></textarea></label>
+            <label class="field wide"><span class="lab">BKR Activity:</span><textarea id="bkrActivity" data-label="BKR Activity" data-multiline="true" lang="en" rows="4" spellcheck="true"></textarea></label>
+          </div>
+        </div>
+
+        <div class="group" data-group>
+          <h3>Annet</h3>
+          <div class="grid">
+            <label class="field"><span class="lab">FYI:</span><input id="fyi" data-label="FYI" lang="en" autocomplete="off"></label>
+            <label class="field"><span class="lab">Logistics:</span><input id="logistics" data-label="Logistics" lang="en" autocomplete="off"></label>
+            <label class="field"><span class="lab">Questions:</span><input id="questions" data-label="Questions" lang="en" autocomplete="off"></label>
+            <label class="field"><span class="lab">Wants:</span><input id="wants" data-label="Wants" lang="en" autocomplete="off"></label>
+          </div>
+        </div>
+
+        <details class="preview">
+          <summary>Forhåndsvisning</summary>
+          <pre id="preview" lang="en"></pre>
+        </details>
+      </section>
+    </main>
+  </div>
+
+  <noscript>
+    <p class="lede" style="max-width:1120px;margin:16px auto;padding:0 24px;">Siden trenger JavaScript. Den lagrer bare i nettleseren, og sender ingenting til en server.</p>
+  </noscript>
+
+  <script>
+    "use strict";
+
+    // Subject formula from Morning Report!D3:
+    // ="NO - "&D5&" - "&D7&" - Morning Report"
+    // D5 is Client, D7 is Field.
+
+    const RECIPIENTS_KEY = "morning-mail-recipients";
+    const DRAFT_KEY = "morning-mail-draft";
+
+    const SAMPLE = {
+      client: "Equinor ASA",
+      rig: "Snorre A",
+      field: "Snorre",
+      well: "34/7-P-9 A",
+      currentService: "Stand by",
+      completedService: [
+        "Perf run 1: 24.5 hours",
+        "Perf run 2: 17 hours",
+        "Perf run 3: 15.25 hours",
+        "Perf run 4: 14.5 hours",
+        "Perf run 5: 17.25 hours",
+        "Perf run 6: 16.00 hours",
+        "Perf run 7: 17.75 hours",
+        "Perf run 8: 14:25 hours",
+        "Perf run 9: 17.25 hours",
+        "Perf run 10: 16.25 hours",
+        "Perf run 11:"
+      ].join("\n"),
+      nextService: [
+        '"Altus" fishing operation.',
+        "1 runs 2-7/8 perforation (might be cancelled)",
+        "10 runs 3-3/8 perforation"
+      ].join("\n"),
+      ja: "605121",
+      zosSap: "113073019 / 908837417",
+      unitPhone: "51573362",
+      dayshift: "K. Selboe, J. Warda",
+      nightshift: "M. Gjessen, M. Watson",
+      flex: "-",
+      crewchanges: [
+        "M. Gjessen going in, M. Watson taking over.",
+        "J. Gjertsen coming out to take over for M. Watson."
+      ].join("\n"),
+      hse: "Following rig program. 1x card per day. Nothing to report.",
+      rigActivity: "Wireline preparing for fishing.",
+      bkrActivity: 'Released the stuck toolstring. First release lower RSS, but tractor was still stuck. Release upper RSS and pulled out of hole. "Altus" now preparing for fishing operation, which is likely next step.',
+      fyi: "-",
+      logistics: "-",
+      questions: "-",
+      wants: "-"
+    };
+
+    const SEED = [
+      { name: "BAADR", email: "", checked: false },
+      { name: "Duty Manager Stv", email: "", checked: false },
+      { name: "Crew", email: "", checked: false },
+      { name: "Personnel Planner", email: "", checked: false },
+      { name: "altus_altus-ops@bakerhughes.com", email: "altus_altus-ops@bakerhughes.com", checked: true }
+    ];
+
+    const subjectEl = document.getElementById("subject");
+    const previewEl = document.getElementById("preview");
+    const notesEl = document.getElementById("notes");
+    const countEl = document.getElementById("count");
+    const sendEl = document.getElementById("send");
+    const listEl = document.getElementById("recipients");
+    const addForm = document.getElementById("add-form");
+    const addName = document.getElementById("add-name");
+    const addEmail = document.getElementById("add-email");
+    const addError = document.getElementById("add-error");
+    const reportEl = document.getElementById("report");
+
+    let seq = 1;
+    let subjectTouched = false;
+    let editingId = null;
+    let confirmId = null;
+    let storageOk = true;
+
+    function nextId() {
+      seq += 1;
+      return "r" + Date.now().toString(36) + seq.toString(36);
+    }
+
+    function fieldElements() {
+      return [...document.querySelectorAll("[data-label]")];
+    }
+
+    function groups() {
+      return [...document.querySelectorAll("[data-group]")].map((group) =>
+        [...group.querySelectorAll("[data-label]")]
+      );
+    }
+
+    function valueOf(el) {
+      return el.value.replace(/\r\n/g, "\n").trim();
+    }
+
+    function patternSubject() {
+      const client = valueOf(document.getElementById("client"));
+      const field = valueOf(document.getElementById("field"));
+      return "NO - " + client + " - " + field + " - Morning Report";
+    }
+
+    function formatField(el) {
+      const label = el.dataset.label;
+      const value = valueOf(el);
+      if (!value) return label + ":";
+      if (el.dataset.multiline === "true" || value.includes("\n")) {
+        return label + ":\n" + value;
+      }
+      return label + ": " + value;
+    }
+
+    function isBlock(el) {
+      return el.dataset.multiline === "true" || valueOf(el).includes("\n");
+    }
+
+    function composeBody() {
+      const grouped = groups();
+      if (!grouped.flat().some((el) => valueOf(el) !== "")) return "";
+      return grouped.map((fields) => {
+        const lines = [];
+        fields.forEach((el) => {
+          if (lines.length && isBlock(el)) lines.push("");
+          lines.push(formatField(el));
+        });
+        return lines.join("\n");
+      }).join("\n\n");
+    }
+
+    function appendBreakable(parent, text) {
+      const parts = String(text).split(/([@._-])/);
+      parts.forEach((part) => {
+        parent.append(part);
+        if (/[@._-]/.test(part)) parent.append(document.createElement("wbr"));
+      });
+    }
+
+    function emailOk(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function validate(name, email, requireEmail) {
+      if (!name) return "Skriv inn et navn.";
+      if (!email && requireEmail) return "Skriv inn en e-postadresse.";
+      if (email && !emailOk(email)) return "E-postadressen ser ikke gyldig ut.";
+      return "";
+    }
+
+    function setError(el, message) {
+      el.hidden = !message;
+      el.textContent = message || "";
+    }
+
+    function freshRecipient(raw) {
+      const name = String(raw && raw.name || "").trim();
+      const email = String(raw && raw.email || "").trim();
+      return {
+        id: raw && typeof raw.id === "string" && raw.id ? raw.id : nextId(),
+        name: name || email,
+        email: email,
+        checked: !!(raw && raw.checked)
+      };
+    }
+
+    function loadJson(key) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (err) {
+        storageOk = false;
+        return null;
+      }
+    }
+
+    function persist(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        storageOk = true;
+      } catch (err) {
+        storageOk = false;
+      }
+    }
+
+    function loadRecipients() {
+      const data = loadJson(RECIPIENTS_KEY);
+      if (!Array.isArray(data)) return null;
+      return data
+        .map(freshRecipient)
+        .filter((rec) => rec.name || rec.email);
+    }
+
+    let recipients = loadRecipients();
+    if (recipients === null) recipients = SEED.map(freshRecipient);
+
+    function saveRecipients() {
+      persist(RECIPIENTS_KEY, recipients);
+    }
+
+    function saveDraft() {
+      const values = {};
+      fieldElements().forEach((el) => {
+        values[el.id] = el.value;
+      });
+      persist(DRAFT_KEY, {
+        subjectTouched: subjectTouched,
+        subject: subjectEl.value,
+        values: values
+      });
+    }
+
+    function applyDraftOrSample() {
+      const draft = loadJson(DRAFT_KEY);
+      if (draft && draft.values && typeof draft.values === "object" && !Array.isArray(draft.values)) {
+        fieldElements().forEach((el) => {
+          if (typeof draft.values[el.id] === "string") el.value = draft.values[el.id];
+        });
+        subjectTouched = draft.subjectTouched === true;
+        subjectEl.value = subjectTouched && typeof draft.subject === "string"
+          ? draft.subject
+          : patternSubject();
+        return;
+      }
+      fieldElements().forEach((el) => {
+        if (Object.prototype.hasOwnProperty.call(SAMPLE, el.id)) el.value = SAMPLE[el.id];
+      });
+      subjectTouched = false;
+      subjectEl.value = patternSubject();
+    }
+
+    function mailtoHref() {
+      const body = composeBody().replace(/\n/g, "\r\n");
+      const to = recipients
+        .filter((rec) => rec.checked && rec.email.trim())
+        .map((rec) => encodeURIComponent(rec.email.trim()))
+        .join(",");
+      return "mailto:" + to
+        + "?subject=" + encodeURIComponent(subjectEl.value)
+        + "&body=" + encodeURIComponent(body);
+    }
+
+    function noteLines() {
+      const lines = [];
+      if (subjectEl.value.trim() === "") lines.push("Emnet er tomt.");
+      if (composeBody() === "") lines.push("Brødteksten er tom.");
+      const checked = recipients.filter((rec) => rec.checked);
+      if (checked.length === 0) lines.push("Ingen mottakere er krysset av.");
+      const missing = checked.filter((rec) => !rec.email.trim());
+      if (missing.length) {
+        lines.push("Mangler e-post, tas ikke med: " + missing.map((rec) => rec.name).join(", "));
+      }
+      if (!storageOk) lines.push("Lagring i nettleseren feilet.");
+      return lines;
+    }
+
+    function refresh() {
+      const body = composeBody();
+      previewEl.textContent = body;
+      const lines = noteLines();
+      notesEl.replaceChildren();
+      lines.forEach((text) => {
+        const li = document.createElement("li");
+        li.textContent = text;
+        notesEl.append(li);
+      });
+      notesEl.hidden = lines.length === 0;
+      const ready = recipients.filter((rec) => rec.checked && rec.email.trim()).length;
+      countEl.textContent = ready === 1 ? "1 mottaker valgt" : ready + " mottakere valgt";
+      sendEl.setAttribute("href", mailtoHref());
+      const header = document.querySelector("header");
+      document.documentElement.style.setProperty("--stick-top", (header.offsetHeight + 12) + "px");
+    }
+
+    function button(label, action, className) {
+      const el = document.createElement("button");
+      el.type = "button";
+      el.dataset.action = action;
+      el.className = className || "ghost";
+      el.textContent = label;
+      return el;
+    }
+
+    function renderRecipients() {
+      listEl.replaceChildren();
+      if (!recipients.length) {
+        const empty = document.createElement("li");
+        empty.className = "empty";
+        empty.textContent = "Ingen mottakere ennå. Legg til navn og e-post under.";
+        listEl.append(empty);
+      }
+      recipients.forEach((rec) => {
+        if (rec.id === editingId) {
+          listEl.append(renderEdit(rec));
+          return;
+        }
+        if (rec.id === confirmId) {
+          listEl.append(renderConfirm(rec));
+          return;
+        }
+        listEl.append(renderRow(rec));
+      });
+      const editName = listEl.querySelector('.edit-form [name="name"]');
+      if (editName) editName.focus();
+      refresh();
+    }
+
+    function renderRow(rec) {
+      const li = document.createElement("li");
+      li.className = "recipient" + (rec.checked ? " is-checked" : "");
+      li.dataset.id = rec.id;
+
+      const label = document.createElement("label");
+      label.className = "check";
+      const box = document.createElement("input");
+      box.type = "checkbox";
+      box.checked = rec.checked;
+      const identity = document.createElement("span");
+      identity.className = "identity";
+      const name = document.createElement("span");
+      name.className = "name";
+      appendBreakable(name, rec.name);
+      identity.append(name);
+      const same = rec.email && rec.name.trim().toLowerCase() === rec.email.trim().toLowerCase();
+      if (!same) {
+        const addr = document.createElement("span");
+        addr.className = "addr" + (rec.email ? "" : " missing");
+        if (rec.email) appendBreakable(addr, rec.email);
+        else addr.textContent = "Mangler e-post";
+        identity.append(addr);
+      }
+      label.append(box, identity);
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      actions.append(button("Rediger", "edit"), button("Slett", "delete", "ghost danger"));
+      li.append(label, actions);
+      return li;
+    }
+
+    function renderEdit(rec) {
+      const li = document.createElement("li");
+      li.className = "recipient";
+      li.dataset.id = rec.id;
+      const form = document.createElement("form");
+      form.className = "edit-form";
+      form.autocomplete = "off";
+
+      form.append(labeledInput("Navn", "name", rec.name, "text"));
+      form.append(labeledInput("E-post", "email", rec.email, "email"));
+      const error = document.createElement("p");
+      error.className = "form-error";
+      error.hidden = true;
+      form.append(error);
+
+      const actions = document.createElement("div");
+      actions.className = "edit-actions";
+      const save = document.createElement("button");
+      save.type = "submit";
+      save.className = "secondary";
+      save.textContent = "Lagre";
+      actions.append(save, button("Avbryt", "cancel-edit", "quiet"));
+      form.append(actions);
+      li.append(form);
+      return li;
+    }
+
+    function labeledInput(label, name, value, kind) {
+      const wrap = document.createElement("label");
+      wrap.className = "field";
+      const span = document.createElement("span");
+      span.className = "lab";
+      span.textContent = label;
+      const input = document.createElement("input");
+      input.name = name;
+      input.value = value;
+      if (kind === "email") {
+        input.inputMode = "email";
+        input.spellcheck = false;
+        input.autocomplete = "email";
+      } else {
+        input.autocomplete = "name";
+      }
+      wrap.append(span, input);
+      return wrap;
+    }
+
+    function renderConfirm(rec) {
+      const li = document.createElement("li");
+      li.className = "recipient confirm-row";
+      li.dataset.id = rec.id;
+      const text = document.createElement("p");
+      text.className = "confirm-text";
+      text.textContent = "Slette " + rec.name + "?";
+      const actions = document.createElement("div");
+      actions.className = "edit-actions";
+      actions.append(
+        button("Ja, slett", "confirm-delete", "danger-solid"),
+        button("Avbryt", "cancel-delete", "quiet")
+      );
+      li.append(text, actions);
+      return li;
+    }
+
+    function findRecipient(id) {
+      return recipients.find((rec) => rec.id === id);
+    }
+
+    listEl.addEventListener("change", (event) => {
+      const input = event.target;
+      if (!(input instanceof HTMLInputElement) || input.type !== "checkbox") return;
+      const rec = findRecipient(input.closest("li").dataset.id);
+      if (!rec) return;
+      rec.checked = input.checked;
+      input.closest("li").classList.toggle("is-checked", rec.checked);
+      saveRecipients();
+      refresh();
+    });
+
+    listEl.addEventListener("click", (event) => {
+      const btn = event.target.closest("button");
+      if (!btn || !listEl.contains(btn)) return;
+      const id = btn.closest("li").dataset.id;
+      const action = btn.dataset.action;
+      if (action === "edit") {
+        editingId = id;
+        confirmId = null;
+        renderRecipients();
+      } else if (action === "delete") {
+        confirmId = id;
+        editingId = null;
+        renderRecipients();
+      } else if (action === "cancel-edit" || action === "cancel-delete") {
+        editingId = null;
+        confirmId = null;
+        renderRecipients();
+      } else if (action === "confirm-delete") {
+        recipients = recipients.filter((rec) => rec.id !== id);
+        editingId = null;
+        confirmId = null;
+        saveRecipients();
+        renderRecipients();
+      }
+    });
+
+    listEl.addEventListener("submit", (event) => {
+      const form = event.target;
+      if (!(form instanceof HTMLFormElement)) return;
+      event.preventDefault();
+      const rec = findRecipient(form.closest("li").dataset.id);
+      if (!rec) return;
+      const name = form.elements.name.value.trim();
+      const email = form.elements.email.value.trim();
+      const message = validate(name, email, false);
+      setError(form.querySelector(".form-error"), message);
+      if (message) return;
+      rec.name = name || email;
+      rec.email = email;
+      editingId = null;
+      saveRecipients();
+      renderRecipients();
+    });
+
+    addForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const name = addName.value.trim();
+      const email = addEmail.value.trim();
+      const message = validate(name, email, true);
+      setError(addError, message);
+      if (message) return;
+      recipients.push(freshRecipient({ name: name, email: email, checked: true }));
+      saveRecipients();
+      addForm.reset();
+      setError(addError, "");
+      editingId = null;
+      confirmId = null;
+      renderRecipients();
+      addName.focus();
+    });
+
+    reportEl.addEventListener("input", (event) => {
+      const target = event.target;
+      if (target === subjectEl) {
+        subjectTouched = subjectEl.value !== patternSubject();
+      } else if (target.matches && target.matches("[data-label]") && !subjectTouched) {
+        subjectEl.value = patternSubject();
+      }
+      refresh();
+      saveDraft();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && (editingId || confirmId)) {
+        editingId = null;
+        confirmId = null;
+        renderRecipients();
+        return;
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+        event.preventDefault();
+        window.location.href = sendEl.getAttribute("href");
+      }
+    });
+
+    window.addEventListener("resize", refresh);
+
+    applyDraftOrSample();
+    renderRecipients();
+  </script>
+</body>
+</html>
